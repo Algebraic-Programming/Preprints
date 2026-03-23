@@ -1,5 +1,6 @@
 
-paper.pdf: paper.bbl paper.aux paper.toc
+paper.pdf: paper.bbl paper.aux #paper.toc
+	pdflatex paper
 	pdflatex paper
 
 paper.bbl: paper.aux paper.bib
