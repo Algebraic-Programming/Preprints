@@ -4,8 +4,8 @@
 \usepackage{fullpage}
 \usepackage[british]{babel}
 
-\title{What everyone should know about scheduling}
-\author{Papp \and Yzelman \and ...}
+\title{What everyone should know about scheduling computations}
+\author{Papp, P. A. \and Yzelman, A. N. \and Steiner, R. S. \and ...}
 
 \begin{document}
 
@@ -92,6 +92,18 @@ Results on FA, GEMM, etc.
 
 \section{How to work around hardness}
 
+While general scheduling is hard in a variety of realistic models,
+scheduling in practice works around these limitations in a variety of ways.
+We index common approaches along the following practical use cases:
+\begin{enumerate}
+	\item minimise horizontal data movement (communication);
+	\item minimise vertical data movement (I/O); and
+	\item minimise data movement throughout hierarchies (NUMA).
+\end{enumerate}
+Through the approaches described,
+the high-performance computing community has proven optimality of specific problems or classes of problems
+as well as realised algorithms and software that achieve this optimal performance in practice.
+
 \subsection{Horizontal data movement}
 
  the results apply to general scheduling-- work around it by restricting to specific problems or families of problems
@@ -99,6 +111,14 @@ Results on FA, GEMM, etc.
 	\item note some examples: FFT, ALP
 	\item note that irregular problems cannot escape hardness, e.g., SpMV
 \end{itemize}
+
+\subsection{Vertical data movement}
+
+This is a much harder problem, solvable to optimality for severely small problems in the general case
+\begin{itemize}
+	\item (point forward to Section on OneStopParallel)
+\end{itemize}
+Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
 
 \subsection{NUMA}
 
@@ -110,14 +130,6 @@ arbitrary factors away from optimal applies when a scheduler has no knowledge ab
 \begin{itemize}
 	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
 \end{itemize}
-
-\subsection{Vertical data movement}
-
-This is a much harder problem, solvable to optimality for severely small problems in the general case
-\begin{itemize}
-	\item (point forward to Section on OneStopParallel)
-\end{itemize}
-Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
 
 Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
 
