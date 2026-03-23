@@ -53,6 +53,7 @@ computation as a (Hyper)DAG
 scheduling is not partitioning
 
 \subsection{Computation model}
+\label{sec:cost-models}
 
 PRAM is not sufficient, must cost communication
 
@@ -101,7 +102,7 @@ Luckily, similar theoretical tools for lower-bound proving transferred to partia
 Results on FA, GEMM, etc.
 
 
-\section{How to work around hardness}
+\section{Avoiding hardness}
 
 While general scheduling is hard in a variety of realistic models,
 scheduling in practice works around these limitations in a variety of ways.
@@ -109,19 +110,51 @@ We index common approaches along the following practical use cases:
 \begin{enumerate}
 	\item minimise horizontal data movement (communication);
 	\item minimise vertical data movement (I/O); and
-	\item minimise data movement throughout hierarchies (NUMA).
+	\item minimise data movement through NUMA hierarchies.
 \end{enumerate}
-Through the approaches described,
-the high-performance computing community has proven optimality of specific problems or classes of problems
-as well as realised algorithms and software that achieve this optimal performance in practice.
+The approaches described below include proven techniques by which the high-performance computing (HPC) community has operated in the last few decades,
+such as proving optimality for specific problems or specific classes of problems,
+as opposed to attempting to find solutions that work in the most generic cases.
+%Such problem-specific approaches have reliably led to algorithms and software that indeed achieve optimal performance in practice.
+We couple outlining these state-of-the-art methodologies with novel insights from our research,
+and close with practical implications to parallel frameworks for AI and beyond,
+run-time system design for modern large-scale compute infrastructures,
+and insights tailored to the complex case of irregular computations.
 
 \subsection{Horizontal data movement}
 
- the results apply to general scheduling-- work around it by restricting to specific problems or families of problems
-\begin{itemize}
-	\item note some examples: FFT, ALP
-	\item note that irregular problems cannot escape hardness, e.g., SpMV
-\end{itemize}
+Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation.
+One such model, the Bulk Synchronous Parallel (BSP) model, %developed during the late 80s,
+comes with two modes of operation, %:
+%one automatic, where programs are expressed sequentially and through hashing of program data, executable in parallel in a fully scalable fashion; and
+%one manual, 
+one of which is the manual mode
+where programs explicitly coordinate computation and communication%, and potentially differ at different processes
+~\cite{valiant90}.
+In both cases, the cost model revolves not only around work-- but also supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models} for details.
+Costs are typically parametrised in the number of processors $p$ available and some problem-specific parameter $\vec{n}$, such as a problem size.
+%To recall, the related system parameters are $g$, the cost of sending one word, and $l$, the cost of moving from one superstep to the next-- principially, making sure that any necessary communications are completed before continuing, and $p$, the number of processing units in the parallel system.
+%Compute costs are hence expressed in terms of $g$ and $l$, while parameterised in $p$ and some problem size $n$.
+%AJ: check later if we do indeed need to recall more of these definitions
+The key phrase here is \emph{problem-specific}: in HPC, by far most known algorithms are manual-mode BSP, and literature is rich with examples of optimal algorithms or algorithms that operate within an optimal trade-off regime.
+%By contrast, most highly scalable big-data frameworks instead operate by automatic-mode BSP, and achieve an \emph{expected} cost of $\mathcal{O}(n/p)$, where $n$ here could be taken as proportional to the number of data accesses the sequential program requires.
+We give two examples, fast Fourier transformation (FFT) and matrix multiplication, and demonstrate how optimal algorithms and optimal trade-offs may be derived.
+
+\subsubsection*{FFT}
+
+introduce notion of immortal algorithms
+
+\subsubsection*{Matrix--matrix multiplication}
+
+introduce notion of polyalgorithms
+
+\subsubsection*{Generalisability}
+
+positive: these are tried an tested approaches. negative: needs human in the loop
+
+novel approaches that automate usage of these insights, e.g., ALP
+
+note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
 
 \subsection{Vertical data movement}
 
