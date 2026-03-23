@@ -1,0 +1,81 @@
+\begin{tikzpicture}
+
+    \node[anchor=center, gray, rotate=90] at (-25pt,97.5pt) {\small \textbf{proc 1}};
+    \node[anchor=center, gray, rotate=90] at (-25pt,57.5pt) {\small \textbf{proc 2}};
+    \node[anchor=center, gray, rotate=90] at (-25pt,17.5pt) {\small \textbf{proc 3}};
+
+    \draw[thick, arrows=-stealth] (-15pt,17.5pt) -- (0pt,17.5pt);
+    \draw[thick, arrows=-stealth] (-15pt,57.5pt) -- (0pt,57.5pt);
+    \draw[thick, arrows=-stealth] (-15pt,97.5pt) -- (0pt,97.5pt);
+	
+    \draw (0pt,0pt) rectangle (60pt,35pt);
+    \node[anchor=center] at (30pt,28pt) {\small compute};
+    \draw[thick, arrows=-stealth] (60pt,17.5pt) -- (75pt,17.5pt);
+
+    \draw (0pt,40pt) rectangle (60pt,75pt);
+    \node[anchor=center] at (30pt,68pt) {\small compute};
+    \draw[thick, arrows=-stealth] (60pt,57.5pt) -- (75pt,57.5pt);
+
+    \draw (0pt,80pt) rectangle (60pt,115pt);
+    \node[anchor=center] at (30pt,108pt) {\small compute};
+    \draw[thick, arrows=-stealth] (60pt,97.5pt) -- (75pt,97.5pt);
+
+    \draw (75pt,0pt) rectangle (95pt,115pt);
+    \node[anchor=center, rotate=90] at (85pt,57.5pt) {\small communicate};
+    \draw[thick, arrows=-stealth] (95pt,17.5pt) -- (110pt,17.5pt);
+    \draw[thick, arrows=-stealth] (95pt,57.5pt) -- (110pt,57.5pt);
+    \draw[thick, arrows=-stealth] (95pt,97.5pt) -- (110pt,97.5pt);
+
+    \draw (110pt,0pt) rectangle (170pt,35pt);
+    \node[anchor=center] at (140pt,28pt) {\small compute};
+    \draw[thick, arrows=-stealth] (170pt,17.5pt) -- (185pt,17.5pt);
+
+    \draw (110pt,40pt) rectangle (170pt,75pt);
+    \node[anchor=center] at (140pt,68pt) {\small compute};
+    \draw[thick, arrows=-stealth] (170pt,57.5pt) -- (185pt,57.5pt);
+
+    \draw (110pt,80pt) rectangle (170pt,115pt);
+    \node[anchor=center] at (140pt,108pt) {\small compute};
+    \draw[thick, arrows=-stealth] (170pt,97.5pt) -- (185pt,97.5pt);
+
+    \draw (185pt,0pt) rectangle (205pt,115pt);
+    \node[anchor=center, rotate=90] at (194pt,57.5pt) {\small communicate};
+    \draw[thick, arrows=-stealth] (205pt,17.5pt) -- (220pt,17.5pt);
+    \draw[thick, arrows=-stealth] (205pt,57.5pt) -- (220pt,57.5pt);
+    \draw[thick, arrows=-stealth] (205pt,97.5pt) -- (220pt,97.5pt);
+
+    \node[anchor=center] at (58pt,128pt) {\small \emph{superstep $s$}};
+    \node[anchor=center] at (158pt,128pt) {\small \emph{superstep $(s\!+\!1)$}};
+
+    \draw[black, fill=white] (12pt,92pt) circle (1.4ex);
+    \node[anchor=center] at (12.5pt,91.5pt) {\small $v_1$};
+    \draw[black, fill=white] (30pt,92pt) circle (1.4ex);
+    \node[anchor=center] at (30.5pt,91.5pt) {\small $v_8$};
+    \draw[black, fill=white] (48pt,92pt) circle (1.4ex);
+    \node[anchor=center] at (48.5pt,91.5pt) {\small $v_5$};
+
+    \draw[black, fill=white] (12pt,52pt) circle (1.4ex);
+    \node[anchor=center] at (12.5pt,51.5pt) {\small $v_2$};
+
+    \draw[black, fill=white] (12pt,12pt) circle (1.4ex);
+    \node[anchor=center] at (12.5pt,11.5pt) {\small $v_7$};
+    \draw[black, fill=white] (45pt,12pt) circle (1.4ex);
+    \node[anchor=center] at (45.5pt,11.5pt) {\small $v_3$};
+
+    \draw[black, fill=white] (122pt,92pt) circle (1.4ex);
+    \node[anchor=center] at (122.5pt,91.5pt) {\small $v_2$};
+
+    \draw[black, fill=white] (122pt,52pt) circle (1.4ex);
+    \node[anchor=center] at (122.25pt,51pt) {\small $v_{_{\!}1_{\!}1}$};
+    \draw[black, fill=white] (140pt,52pt) circle (1.4ex);
+    \node[anchor=center] at (140.5pt,51.5pt) {\small $v_4$};
+
+    \draw[black, fill=white] (150pt,12pt) circle (1.4ex);
+    \node[anchor=center] at (150.5pt,11.5pt) {\small $v_9$};
+
+    \draw[ultra thick, gray, arrows=-stealth, densely dashed] (37pt,12pt) -- (31pt,12pt) -- (31pt,52pt) -- (45pt,52pt);
+
+    \draw[ultra thick, gray, arrows=-stealth, densely dashed] (45pt,4pt) -- (45pt,-4pt) -- (123pt,-4pt) -- (123pt,12pt);
+        
+
+\end{tikzpicture}

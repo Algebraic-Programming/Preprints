@@ -1,0 +1,154 @@
+\begin{tikzpicture}
+	
+	
+	\draw[ultra thick, gray, densely dotted] (-28pt,38pt) -- (-28pt,22pt) -- (-12pt,22pt) -- (-12pt,38pt) -- cycle;
+        \draw[ultra thick, gray, densely dotted] (-8pt,35pt) -- (-8pt,60pt) -- (41pt,60pt) -- (41pt,35pt) -- cycle;
+        \draw[ultra thick, gray, densely dotted] (-8pt,32pt) -- (-8pt,12pt) -- (41pt,12pt) -- (41pt,32pt) -- cycle;
+        \draw[ultra thick, gray, densely dotted] (45pt,22pt) -- (45pt,39pt) -- (61pt,39pt) -- (61pt,22pt) -- cycle;
+        \draw[ultra thick, gray, densely dotted] (66pt,33pt) -- (66pt,60pt) -- (117pt,60pt) -- (117pt,33pt) -- cycle;
+        \draw[ultra thick, gray, densely dotted] (66pt,28pt) -- (66pt,12pt) -- (117pt,12pt) -- (117pt,28pt) -- cycle;
+        \draw[ultra thick, gray, densely dotted] (121pt,22pt) -- (121pt,39pt) -- (137pt,39pt) -- (137pt,22pt) -- cycle;
+
+        \node[anchor=center, gray] at (-20pt,17pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (-20pt,11pt) {\scriptsize \textbf{step }$\mathbf{\!1}$};
+
+        \node[anchor=center, gray] at (16.5pt,65pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$, \textbf{step }$\mathbf{\!2}$};
+        \node[anchor=center, gray] at (16.5pt,7pt) {\scriptsize \textbf{proc }$\mathbf{\!2}$, \textbf{step }$\mathbf{\!2}$};
+
+        \node[anchor=center, gray] at (53pt,17pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (53pt,11pt) {\scriptsize \textbf{step }$\mathbf{\!3}$};
+
+        \node[anchor=center, gray] at (91.5pt,65pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$, \textbf{step }$\mathbf{\!4}$};
+        \node[anchor=center, gray] at (91.5pt,7pt) {\scriptsize \textbf{proc }$\mathbf{\!2}$, \textbf{step }$\mathbf{\!4}$};
+
+        \node[anchor=center, gray] at (129pt,17pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (129pt,11pt) {\scriptsize \textbf{step }$\mathbf{\!5}$};
+	
+	%---
+	
+	\draw[arrows=-Stealth] (-18pt,30pt) -- (-2pt,39pt);
+        \draw[arrows=-Stealth] (-18pt,30pt) -- (-2pt,18pt);
+	\draw[arrows=-Stealth] (0pt,40pt) -- (15pt,40pt);
+        \draw[arrows=-Stealth] (0pt,40pt) -- (33pt,56pt);
+	\draw[arrows=-Stealth] (18pt,40pt) -- (33pt,40pt);
+        \draw[arrows=-Stealth] (18pt,40pt) -- (34pt,53pt);
+        
+	\draw[arrows=-Stealth] (0pt,17pt) -- (33pt,17pt);
+	\draw[arrows=-Stealth] (0pt,17pt) -- (16pt,25pt);
+	\draw[arrows=-Stealth] (18pt,27pt) -- (35pt,19pt);
+ 
+	\draw[arrows=-Stealth] (36pt,55pt) -- (54pt,33pt);
+	\draw[arrows=-Stealth] (36pt,17pt) -- (51pt,28pt);
+	\draw[arrows=-Stealth] (36pt,40pt) -- (51pt,32pt);
+ 
+	\draw[arrows=-Stealth] (54pt,30pt) -- (74pt,39pt);
+        \draw[arrows=-Stealth] (54pt,30pt) -- (74pt,21pt);
+ 
+	\draw[arrows=-Stealth] (76pt,20pt) -- (92pt,20pt);
+        \draw[arrows=-Stealth] (94pt,20pt) -- (109pt,20pt);
+        \draw[arrows=-Stealth] (112pt,20pt) -- (128pt,29pt);
+
+        \draw[arrows=-Stealth] (76pt,40pt) -- (92pt,40pt);
+        \draw[arrows=-Stealth] (94pt,40pt) -- (110pt,40pt);
+        \draw[arrows=-Stealth] (112pt,40pt) -- (128pt,31pt);
+
+        \draw[arrows=-Stealth] (76pt,40pt) -- (92pt,54pt);
+        \draw[arrows=-Stealth] (94pt,40pt) -- (110.5pt,52.5pt);
+        \draw[arrows=-Stealth] (94pt,55pt) -- (110.5pt,42.5pt);
+        \draw[arrows=-Stealth] (94pt,55pt) -- (110pt,55pt);
+ 
+	\draw[arrows=-Stealth] (112pt,55pt) -- (130pt,33pt);
+	
+	%---
+
+        \draw[black, fill=white] (-18pt,30pt) circle (0.6ex);
+        \draw[black, fill=white] (0pt,40pt) circle (0.6ex);
+        \draw[black, fill=white] (0pt,17pt) circle (0.6ex);
+        \draw[black, fill=white] (18pt,27pt) circle (0.6ex);
+        \draw[black, fill=white] (36pt,17pt) circle (0.6ex);
+        \draw[black, fill=white] (18pt,40pt) circle (0.6ex);
+        \draw[black, fill=white] (36pt,40pt) circle (0.6ex);
+        \draw[black, fill=white] (36pt,55pt) circle (0.6ex);
+        \draw[black, fill=white] (54pt,30pt) circle (0.6ex);
+        \draw[black, fill=white] (76pt,20pt) circle (0.6ex);
+        \draw[black, fill=white] (76pt,40pt) circle (0.6ex);
+        \draw[black, fill=white] (94pt,20pt) circle (0.6ex);
+        \draw[black, fill=white] (94pt,40pt) circle (0.6ex);
+        \draw[black, fill=white] (94pt,55pt) circle (0.6ex);
+        \draw[black, fill=white] (112pt,55pt) circle (0.6ex);
+        \draw[black, fill=white] (112pt,20pt) circle (0.6ex);
+        \draw[black, fill=white] (112pt,40pt) circle (0.6ex);
+        \draw[black, fill=white] (130pt,30pt) circle (0.6ex);
+
+
+
+        %---
+
+        %---
+
+
+        \draw[ultra thick, gray, dashed] (-25pt,100pt) -- (-25pt,154pt) -- (60pt,154pt) -- (60pt,100pt) -- cycle;
+	\draw[ultra thick, gray, dashed] (138pt,100pt) -- (138pt,154pt) -- (66pt,154pt) -- (66pt,100pt) -- cycle;
+	
+	\node[anchor=center, gray] at (19pt,94pt) {\scriptsize \textbf{processor }$\mathbf{1}$};
+	\node[anchor=center, gray] at (102pt,94pt) {\scriptsize \textbf{processor }$\mathbf{2}$};
+	
+	%---
+	
+	\draw[arrows=-Stealth] (-18pt,120pt) -- (-2pt,129pt);
+        \draw[arrows=-Stealth] (-18pt,120pt) -- (-2pt,108pt);
+	\draw[arrows=-Stealth] (0pt,130pt) -- (15pt,130pt);
+        \draw[arrows=-Stealth] (0pt,130pt) -- (33pt,146pt);
+	\draw[arrows=-Stealth] (18pt,130pt) -- (33pt,130pt);
+        \draw[arrows=-Stealth] (18pt,130pt) -- (34pt,143pt);
+        
+	\draw[arrows=-Stealth] (0pt,107pt) -- (33pt,107pt);
+	\draw[arrows=-Stealth] (0pt,107pt) -- (16pt,115pt);
+	\draw[arrows=-Stealth] (18pt,117pt) -- (35pt,109pt);
+ 
+	\draw[arrows=-Stealth] (36pt,145pt) -- (54pt,123pt);
+	\draw[arrows=-Stealth] (36pt,107pt) -- (51pt,118pt);
+	\draw[arrows=-Stealth] (36pt,130pt) -- (51pt,122pt);
+ 
+	\draw[arrows=-Stealth] (54pt,120pt) -- (74pt,129pt);
+        \draw[arrows=-Stealth] (54pt,120pt) -- (74pt,111pt);
+ 
+	\draw[arrows=-Stealth] (76pt,110pt) -- (92pt,110pt);
+        \draw[arrows=-Stealth] (94pt,110pt) -- (109pt,110pt);
+        \draw[arrows=-Stealth] (112pt,110pt) -- (128pt,119pt);
+
+        \draw[arrows=-Stealth] (76pt,130pt) -- (92pt,130pt);
+        \draw[arrows=-Stealth] (94pt,130pt) -- (110pt,130pt);
+        \draw[arrows=-Stealth] (112pt,130pt) -- (128pt,121pt);
+
+        \draw[arrows=-Stealth] (76pt,130pt) -- (92pt,144pt);
+        \draw[arrows=-Stealth] (94pt,130pt) -- (110.5pt,142.5pt);
+        \draw[arrows=-Stealth] (94pt,145pt) -- (110.5pt,132.5pt);
+        \draw[arrows=-Stealth] (94pt,145pt) -- (110pt,145pt);
+ 
+	\draw[arrows=-Stealth] (112pt,145pt) -- (130pt,123pt);
+	
+	%---
+
+        \draw[black, fill=white] (-18pt,120pt) circle (0.6ex);
+        \draw[black, fill=white] (0pt,130pt) circle (0.6ex);
+        \draw[black, fill=white] (0pt,107pt) circle (0.6ex);
+        \draw[black, fill=white] (18pt,117pt) circle (0.6ex);
+        \draw[black, fill=white] (36pt,107pt) circle (0.6ex);
+        \draw[black, fill=white] (18pt,130pt) circle (0.6ex);
+        \draw[black, fill=white] (36pt,130pt) circle (0.6ex);
+        \draw[black, fill=white] (36pt,145pt) circle (0.6ex);
+        \draw[black, fill=white] (54pt,120pt) circle (0.6ex);
+        \draw[black, fill=white] (76pt,110pt) circle (0.6ex);
+        \draw[black, fill=white] (76pt,130pt) circle (0.6ex);
+        \draw[black, fill=white] (94pt,110pt) circle (0.6ex);
+        \draw[black, fill=white] (94pt,130pt) circle (0.6ex);
+        \draw[black, fill=white] (94pt,145pt) circle (0.6ex);
+        \draw[black, fill=white] (112pt,145pt) circle (0.6ex);
+        \draw[black, fill=white] (112pt,110pt) circle (0.6ex);
+        \draw[black, fill=white] (112pt,130pt) circle (0.6ex);
+        \draw[black, fill=white] (130pt,120pt) circle (0.6ex);
+        
+
+
+\end{tikzpicture}

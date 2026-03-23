@@ -1,0 +1,82 @@
+\begin{tikzpicture}
+	
+	\draw[thick]
+	(40pt,20pt) --
+	(20pt,65pt) -- (40pt,110pt);
+	
+	\draw[thick] (81pt,15pt) -- (96pt,33pt) --
+	(105pt,53pt) --
+	(105pt,77pt) --
+	(96pt,97pt) --
+	(81pt,115pt);
+	
+	\draw[fill=white] (10pt,55pt) -- (10pt,75pt) -- (30pt,75pt) -- (30pt,55pt) -- cycle;
+	
+	\draw[fill=white] (30pt,10pt) -- (30pt,30pt) -- (50pt,30pt) -- (50pt,10pt) -- cycle;
+	
+	\draw[fill=white] (30pt,100pt) -- (30pt,120pt) -- (50pt,120pt) -- (50pt,100pt) -- cycle;
+	
+	\draw[fill=white] (76pt,10pt) -- (76pt,20pt) -- (86pt,20pt) -- (86pt,10pt) -- cycle;
+	
+	\draw[fill=white] (91pt,28pt) -- (91pt,38pt) -- (101pt,38pt) -- (101pt,28pt) -- cycle;
+	
+	\draw[fill=white] (100pt,48pt) -- (100pt,58pt) -- (110pt,58pt) -- (110pt,48pt) -- cycle;
+	
+	\draw[fill=white] (100pt,72pt) -- (100pt,82pt) -- (110pt,82pt) -- (110pt,72pt) -- cycle;
+	
+	\draw[fill=white] (91pt,92pt) -- (91pt,102pt) -- (101pt,102pt) -- (101pt,92pt) -- cycle;
+	
+	\draw[fill=white] (76pt,110pt) -- (76pt,120pt) -- (86pt,120pt) -- (86pt,110pt) -- cycle;
+	
+	
+	%---
+	
+	
+	\draw[thick]
+	(195pt,20pt) --
+	(175pt,65pt) -- (195pt,110pt);
+	
+	\draw[thick] (236pt,15pt) -- (251pt,33pt) --
+	(260pt,53pt) --
+	(260pt,77pt) --
+	(251pt,97pt) --
+	(236pt,115pt);
+	
+	\draw[fill=white] (165pt,55pt) -- (165pt,75pt) -- (185pt,75pt) -- (185pt,55pt) -- cycle;
+	
+	\draw[fill=white] (185pt,10pt) -- (185pt,30pt) -- (205pt,30pt) -- (205pt,10pt) -- cycle;
+	
+	\draw[fill=white] (185pt,100pt) -- (185pt,120pt) -- (205pt,120pt) -- (205pt,100pt) -- cycle;
+	
+	\draw[fill=white] (231pt,10pt) -- (231pt,20pt) -- (241pt,20pt) -- (241pt,10pt) -- cycle;
+	
+	\draw[fill=white] (246pt,28pt) -- (246pt,38pt) -- (256pt,38pt) -- (256pt,28pt) -- cycle;
+	
+	\draw[fill=white] (255pt,48pt) -- (255pt,58pt) -- (265pt,58pt) -- (265pt,48pt) -- cycle;
+	
+	\draw[fill=white] (255pt,72pt) -- (255pt,82pt) -- (265pt,82pt) -- (265pt,72pt) -- cycle;
+	
+	\draw[fill=white] (246pt,92pt) -- (246pt,102pt) -- (256pt,102pt) -- (256pt,92pt) -- cycle;
+	
+	\draw[fill=white] (231pt,110pt) -- (231pt,120pt) -- (241pt,120pt) -- (241pt,110pt) -- cycle;
+	
+	%---
+	
+	\draw[gray, ultra thick, dashed] (63pt,10pt) -- (63pt,120pt);
+	
+	\draw[gray, ultra thick, dashed] (5pt,65pt) -- (50pt,65pt);
+	
+	\draw[gray, ultra thick, dashed] (76pt,65pt) -- (121pt,65pt);
+	
+	\begin{scope}[rounded corners = 5pt, dashed]
+    \draw[gray, ultra thick] (180pt,125pt) -- (246pt,125pt) -- (246pt,109pt) -- (202pt,95pt) -- (180pt,95pt) -- cycle;
+    
+    \draw[gray, ultra thick] (180pt,5pt) -- (246pt,5pt) -- (246pt,21pt) -- (202pt,35pt) -- (180pt,35pt) -- cycle;
+    
+    \draw[gray, ultra thick] (160pt,80pt) -- (188pt,80pt) -- (246pt,105pt) -- (260pt,105pt) -- (260pt,89pt) -- (251pt,89pt) -- (190pt,50pt) -- (160pt,50pt) -- cycle;
+    
+    \draw[gray, ultra thick] (252pt,85pt) -- (269pt,85pt) -- (269pt,45pt) -- (259pt,24pt) -- (242pt,24pt) -- (242pt,38pt) -- cycle;
+    \end{scope}
+
+
+\end{tikzpicture}

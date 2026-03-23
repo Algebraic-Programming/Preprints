@@ -1,0 +1,47 @@
+\begin{tikzpicture}
+	
+    \draw[very thick, gray] (0pt,100pt) rectangle (160pt,80pt);
+    \node[anchor=center] at (80pt,90pt) {\small Network};
+
+    \draw[very thick, gray] (0pt,23pt) rectangle (70pt,-21pt);
+    \draw[very thick, gray] (90pt,23pt) rectangle (160pt,-21pt);
+
+    \draw[very thick, gray] (0pt,42pt) rectangle (70pt,61pt);
+    \draw[very thick, gray] (90pt,42pt) rectangle (160pt,61pt);
+    \node[anchor=center] at (35pt,51.5pt) {\footnotesize RAM};
+    \node[anchor=center] at (125pt,51.5pt) {\footnotesize RAM};
+
+    \draw[thick, gray] (6pt,-2pt) rectangle (24pt,13pt);
+    \node[anchor=center] at (15pt,5.5pt) {\footnotesize core};
+
+    \node[anchor=center] at (35pt,2pt) {\textbf{...}};
+    \node[anchor=center] at (35pt,17pt) {\footnotesize CPU};
+
+    \draw[thick, gray] (46pt,-2pt) rectangle (64pt,13pt);
+    \node[anchor=center] at (55pt,5.5pt) {\footnotesize core};
+
+    \draw[thick, gray] (96pt,-2pt) rectangle (114pt,13pt);
+    \node[anchor=center] at (105pt,5.5pt) {\footnotesize core};
+
+    \node[anchor=center] at (125pt,2pt) {\textbf{...}};
+    \node[anchor=center] at (125pt,17pt) {\footnotesize CPU};
+
+    \draw[thick, gray] (136pt,-2pt) rectangle (154pt,13pt);
+    \node[anchor=center] at (145pt,5.5pt) {\footnotesize core};
+
+    \draw[very thick, arrows=Stealth-Stealth] (35pt,57pt) -- (35pt,84pt);
+    \draw[very thick, arrows=Stealth-Stealth] (125pt,57pt) -- (125pt,84pt);
+
+    \draw[very thick, arrows=Stealth-Stealth] (15pt,10pt) -- (15pt,45pt);
+    \draw[very thick, arrows=Stealth-Stealth] (55pt,10pt) -- (55pt,45pt);
+    \draw[very thick, arrows=Stealth-Stealth] (105pt,10pt) -- (105pt,45pt);
+    \draw[very thick, arrows=Stealth-Stealth] (145pt,10pt) -- (145pt,45pt);
+
+    \draw[thick, densely dotted, arrows=-Stealth] (18pt,0pt) -- (18pt,-10pt) -- (55pt,-10pt) -- (55pt,0pt);
+    \node[anchor=center] at (36pt,-15pt) {\footnotesize \textit{fast}};
+
+    \draw[thick, densely dotted, arrows=-Stealth] (12pt,0pt) -- (12pt,-27pt) -- (105pt,-27pt) -- (105pt,0pt);
+    \node[anchor=center] at (59pt,-32pt) {\footnotesize \textit{much slower}};
+        
+
+\end{tikzpicture}

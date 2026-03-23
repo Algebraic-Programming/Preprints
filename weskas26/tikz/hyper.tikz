@@ -1,0 +1,44 @@
+\begin{tikzpicture}
+	
+	
+
+
+        %\draw[ultra thick, gray, dashed] (-25pt,100pt) -- (-25pt,154pt) -- (60pt,154pt) -- (60pt,100pt) -- cycle;
+	
+	%\node[anchor=center, gray] at (19pt,94pt) {\scriptsize \textbf{processor }$\mathbf{1}$};
+
+        \begin{scope}[rounded corners = 5pt]
+	\draw[gray, ultra thick, densely dotted] (-12pt,-10pt) -- (-12pt,40pt) -- (10pt,40pt) -- (50pt,37pt) -- (50pt,15pt) -- (10pt,-10pt) -- cycle;
+
+        \draw[gray, ultra thick, densely dotted] (30pt,34pt) -- (50pt,34pt) -- (75pt,15pt) -- (75pt,-4pt) -- (55pt,-4pt) -- (30pt,15pt) -- cycle;
+
+        \draw[gray, ultra thick, densely dotted] (55pt,-7pt) -- (55pt,15pt) -- (83pt,37pt) -- (90pt,74pt) -- (112pt,74pt) -- (112pt,-10pt) -- (90pt,-10pt) -- cycle;
+
+        \draw[gray, ultra thick, densely dotted] (2pt,77pt) -- (109pt,77pt) -- (109pt,55pt) -- (90pt,55pt) -- (65pt,50pt)  -- (45pt,50pt) -- (10pt,20pt) -- (-9pt,20pt) -- (-9pt,40pt) -- cycle;
+	
+	\end{scope}
+
+        \draw[black, fill=white] (0pt,0pt) circle (1.4ex);
+        \draw[black, fill=white] (0pt,30pt) circle (1.4ex);
+        \draw[black, fill=white] (40pt,25pt) circle (1.4ex);
+        \draw[black, fill=white] (10pt,65pt) circle (1.4ex);
+        \draw[black, fill=white] (65pt,5pt) circle (1.4ex);
+        \draw[black, fill=white] (100pt,0pt) circle (1.4ex);
+        \draw[black, fill=white] (90pt,30pt) circle (1.4ex);
+        \draw[black, fill=white] (55pt,60pt) circle (1.4ex);
+        \draw[black, fill=white] (100pt,65pt) circle (1.4ex);
+
+        \node[anchor=center] at (0.5pt,-0.5pt) {\small $v_7$};
+        \node[anchor=center] at (0.5pt,29.5pt) {\small $v_4$};
+        \node[anchor=center] at (40.5pt,24.5pt) {\small $v_5$};
+        \node[anchor=center] at (10.5pt,64.5pt) {\small $v_1$};
+        \node[anchor=center] at (65.5pt,4.5pt) {\small $v_8$};
+        \node[anchor=center] at (100.5pt,-0.5pt) {\small $v_9$};
+        \node[anchor=center] at (90.5pt,29.5pt) {\small $v_6$};
+        \node[anchor=center] at (55.5pt,59.5pt) {\small $v_2$};
+        \node[anchor=center] at (100.5pt,64.5pt) {\small $v_3$};
+
+        
+
+
+\end{tikzpicture}

@@ -1,0 +1,25 @@
+\begin{tikzpicture}
+
+    \draw[gray, ultra thick] (-4pt,12pt) -- (227pt,12pt) -- (227pt,-170pt)  -- (-4pt,-170pt) -- cycle;
+
+    \node[anchor=west] at (0pt,0pt) {Every node assigned to exactly one partition:};
+
+    \node[anchor=center] at (37pt,-25pt) {$\displaystyle \sum_{p=1}^k \, x_{v,p} = 1 \quad$};
+
+    \node[anchor=west] at (120pt,-25pt) {\small \emph{for all nodes $v$}};
+
+    \node[anchor=west] at (0pt,-65pt) {Each partition satisfies the balance constraint:};
+
+    \node[anchor=center] at (52pt,-90pt) {$\displaystyle \sum_{v=1}^n \, x_{v,p} \leq (1+\varepsilon) \cdot \frac{n}{k}$};
+    
+    \node[anchor=west] at (120pt,-90pt) {\small  \emph{for all partitions $p$}};
+
+    \node[anchor=west] at (0pt,-130pt) {Ensure correct behavior of indicator variables $y_{h,p}$:};
+
+    \node[anchor=center] at (45pt,-155pt) {$x_{v,p} \leq y_{h, p}$};
+
+    \node[anchor=west] at (120pt,-150pt) {\small \emph{for all partitions $p$, all}};
+    \node[anchor=west] at (120pt,-160pt) {\small \emph{nodes $v$ in a hyperedge $h$}};
+
+
+\end{tikzpicture}

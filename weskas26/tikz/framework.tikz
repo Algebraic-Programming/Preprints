@@ -1,0 +1,98 @@
+\begin{tikzpicture}
+	
+    \node[anchor=center] at (60pt,-15pt) {\small \textit{BSP schedule}};
+
+    \draw (-5pt,35pt) rectangle (45pt,14pt);
+    \node[anchor=center] at (20pt,29pt) {\small naive};
+    \node[anchor=center] at (20pt,20pt) {\small (full) ILP};
+
+    \draw (75pt,35pt) rectangle (125pt,14pt);
+    \node[anchor=center] at (100pt,29pt) {\small partial ILP};
+    \node[anchor=center] at (100pt,20pt) {\small methods};
+
+    \node[anchor=center] at (25pt,56pt) {\footnotesize \textit{very small DAG}};
+    \node[anchor=center] at (95pt,56pt) {\footnotesize \textit{larger DAG}};
+
+    \node[anchor=center] at (60pt,75pt) {\small select best solution};
+
+    \draw (-25pt,100pt) rectangle (25pt,115pt);
+    \node[anchor=center] at (0pt,107.5pt) {\small local search};
+
+    \draw (35pt,100pt) rectangle (85pt,115pt);
+    \node[anchor=center] at (60pt,107.5pt) {\small local search};
+
+    \draw (95pt,100pt) rectangle (145pt,115pt);
+    \node[anchor=center] at (120pt,107.5pt) {\small local search};
+
+    \draw (-25pt,132pt) rectangle (25pt,153pt);
+    \node[anchor=center] at (0pt,147pt) {\small barrier list};
+    \node[anchor=center] at (0pt,138pt) {\small scheduler $1$};
+
+    \draw (35pt,132pt) rectangle (85pt,153pt);
+    \node[anchor=center] at (60pt,147pt) {\small barrier list};
+    \node[anchor=center] at (60pt,138pt) {\small scheduler $2$};
+
+    \draw (95pt,132pt) rectangle (145pt,153pt);
+    \node[anchor=center] at (120pt,147pt) {\small barrier list};
+    \node[anchor=center] at (120pt,138pt) {\small scheduler $3$};
+
+    \node[anchor=center] at (60pt,182pt) {\small \textit{scheduling problem}};
+
+    \node[anchor=center] at (60pt,205pt) {\textbf{\textsc{Base scheduler:}}};
+
+
+    \draw[thick] (20pt,11pt) -- (20pt,3pt) -- (100pt,3pt) -- (100pt,11pt);
+    \draw[thick] (60pt,69pt) -- (60pt,50pt);
+    \begin{scope}[thick, arrows=-stealth]
+    \draw (60pt,3pt) -- (60pt,-10pt);
+    \draw (60pt,50pt) -- (20pt,50pt) -- (20pt,38pt);
+    \draw (60pt,50pt) -- (100pt,50pt) -- (100pt,38pt);
+    \draw (60pt,98pt) -- (60pt,80pt);
+    \draw (0pt,98pt) -- (0pt,90pt) -- (52pt,90pt) -- (52pt,80pt);
+    \draw (120pt,98pt) -- (120pt,90pt) -- (68pt,90pt) -- (68pt,80pt);
+    \draw (0pt,130pt) -- (0pt,116pt);
+    \draw (60pt,130pt) -- (60pt,116pt);
+    \draw (120pt,130pt) -- (120pt,116pt);
+    \draw (60pt,175pt) -- (60pt,155pt);
+    \draw (52pt,175pt) -- (52pt,165pt) -- (0pt,165pt) -- (0pt,155pt);
+    \draw (68pt,175pt) -- (68pt,165pt) -- (120pt,165pt) -- (120pt,155pt);
+    \end{scope}
+
+    %----
+
+    \node[anchor=center] at (210pt,205pt) {\textbf{\textsc{Multilevel:}}};
+
+    \node[anchor=center] at (210pt,182pt) {\small \textit{scheduling problem}};
+
+    \draw[thick, arrows=-stealth] (210pt,175pt) -- (210pt,155pt);
+
+    \draw (183pt,138pt) rectangle (238pt,153pt);
+    \node[anchor=center] at (210pt,145.5pt) {\small coarsen DAG};
+
+    \draw[thick, arrows=-stealth] (210pt,135pt) -- (210pt,120pt);
+
+    \draw (173pt,116.5pt) rectangle (247pt,98.5pt);
+    \node[anchor=center] at (210pt,107.5pt) {\small \textsc{base scheduler}};
+
+    \draw[thick, arrows=-stealth] (210pt,94pt) -- (210pt,82pt);
+
+    \node[anchor=center] at (210pt,76pt) {\small \textit{schedule for}};
+    \node[anchor=center] at (210pt,67pt) {\small \textit{coarse DAG}};
+
+    \draw[thick, arrows=-stealth] (210pt,61pt) -- (210pt,34pt);
+
+    \draw[thick, arrows=-stealth] (185pt,31pt) rectangle (235pt,10pt);
+    \node[anchor=center] at (210pt,25pt) {\small uncoarsen};
+    \node[anchor=center] at (210pt,16pt) {\small \& refine};
+
+    \draw[thick, arrows=-stealth] (210pt,7pt) -- (210pt,-10pt);
+
+    \node[anchor=center] at (210pt,-15pt) {\small \textit{BSP schedule}};
+
+    \draw[thick, arrows=-stealth] (159pt,57pt) rectangle (185pt,37pt);
+    \node[anchor=center] at (172pt,51pt) {\small local};
+    \node[anchor=center] at (172pt,43pt) {\small search};
+    \draw[thick, dashed, arrows=-stealth] (172pt,37pt) -- (172pt,20pt) -- (185pt,20pt);
+
+
+\end{tikzpicture}

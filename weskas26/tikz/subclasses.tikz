@@ -1,0 +1,70 @@
+\begin{tikzpicture}
+	
+	
+	\node[anchor=center, gray] at (60pt,-10pt) {\textbf{in-tree}};
+	
+	%---
+	
+	\draw[thick, arrows=-Stealth] (90pt,80pt) -- (118pt,62pt);
+        \draw[thick, arrows=-Stealth] (90pt,30pt) -- (118pt,58pt);
+        \draw[thick, arrows=-Stealth] (60pt,30pt) -- (87pt,30pt);
+        \draw[thick, arrows=-Stealth] (60pt,80pt) -- (87pt,80pt);
+        \draw[thick, arrows=-Stealth] (60pt,60pt) -- (88pt,77pt);
+        \draw[thick, arrows=-Stealth] (60pt,100pt) -- (88pt,83pt);
+        \draw[thick, arrows=-Stealth] (30pt,20pt) -- (58pt,27pt);
+        \draw[thick, arrows=-Stealth] (30pt,40pt) -- (58pt,33pt);
+        \draw[thick, arrows=-Stealth] (30pt,100pt) -- (57pt,100pt);
+        \draw[thick, arrows=-Stealth] (30pt,80pt) -- (58pt,97pt);
+        \draw[thick, arrows=-Stealth] (0pt,60pt) -- (28pt,77pt);
+        \draw[thick, arrows=-Stealth] (0pt,80pt) -- (27pt,80pt);
+        \draw[thick, arrows=-Stealth] (0pt,100pt) -- (28pt,83pt);
+	
+	%---
+
+        \draw[black, fill=white] (120pt,60pt) circle (0.9ex);
+        \draw[black, fill=white] (90pt,30pt) circle (0.9ex);
+        \draw[black, fill=white] (90pt,80pt) circle (0.9ex);
+        \draw[black, fill=white] (60pt,80pt) circle (0.9ex);
+        \draw[black, fill=white] (60pt,60pt) circle (0.9ex);
+        \draw[black, fill=white] (60pt,100pt) circle (0.9ex);
+        \draw[black, fill=white] (60pt,30pt) circle (0.9ex);
+        \draw[black, fill=white] (30pt,20pt) circle (0.9ex);
+        \draw[black, fill=white] (30pt,40pt) circle (0.9ex);
+        \draw[black, fill=white] (30pt,100pt) circle (0.9ex);
+        \draw[black, fill=white] (30pt,80pt) circle (0.9ex);
+        \draw[black, fill=white] (0pt,80pt) circle (0.9ex);
+        \draw[black, fill=white] (0pt,60pt) circle (0.9ex);
+        \draw[black, fill=white] (0pt,100pt) circle (0.9ex);
+
+        %---
+        %---
+        %---
+
+        \node[anchor=center, gray] at (205pt,-10pt) {\textbf{2-layer DAG}};
+
+        \draw[thick, arrows=-Stealth] (180pt,90pt) -- (227pt,101pt);
+        \draw[thick, arrows=-Stealth] (180pt,70pt) -- (227pt,97pt);
+        \draw[thick, arrows=-Stealth] (180pt,70pt) -- (226pt,60pt);
+        \draw[thick, arrows=-Stealth] (180pt,70pt) -- (228pt,44pt);
+        \draw[thick, arrows=-Stealth] (180pt,50pt) -- (227pt,81pt);
+        \draw[thick, arrows=-Stealth] (180pt,50pt) -- (226.5pt,40pt);
+        \draw[thick, arrows=-Stealth] (180pt,50pt) -- (227pt,23pt);
+        \draw[thick, arrows=-Stealth] (180pt,30pt) -- (227pt,77pt);
+        \draw[thick, arrows=-Stealth] (180pt,30pt) -- (228pt,36pt);
+        \draw[thick, arrows=-Stealth] (180pt,30pt) -- (227pt,19pt);
+
+        %---
+
+        \draw[black, fill=white] (180pt,30pt) circle (0.9ex);
+        \draw[black, fill=white] (180pt,50pt) circle (0.9ex);
+        \draw[black, fill=white] (180pt,70pt) circle (0.9ex);
+        \draw[black, fill=white] (180pt,90pt) circle (0.9ex);
+        \draw[black, fill=white] (230pt,20pt) circle (0.9ex);
+        \draw[black, fill=white] (230pt,40pt) circle (0.9ex);
+        \draw[black, fill=white] (230pt,60pt) circle (0.9ex);
+        \draw[black, fill=white] (230pt,80pt) circle (0.9ex);
+        \draw[black, fill=white] (230pt,100pt) circle (0.9ex);
+        
+
+
+\end{tikzpicture}

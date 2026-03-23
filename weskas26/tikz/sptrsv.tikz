@@ -1,0 +1,64 @@
+\begin{tikzpicture}
+
+    \draw[gray, ultra thick] (-4pt,162pt) -- (-17pt,162pt) -- (-17pt,18pt)  -- (-4pt,18pt);
+    \draw[gray, ultra thick] (124pt,162pt) -- (137pt,162pt) -- (137pt,18pt)  -- (124pt,18pt);
+
+    \node[anchor=center] at (0pt,150pt) {$5.00$};
+    \node[anchor=center] at (0pt,90pt) {$0.75$};
+    %\node[anchor=center] at (0pt,0pt) {$3.22$};
+    \node[anchor=center] at (30pt,120pt) {$7.60$};
+    \node[anchor=center] at (30pt,60pt) {$9.50$};
+    \node[anchor=center] at (28pt,30pt) {$-1.10$};
+    \node[anchor=center] at (58pt,90pt) {$-2.12$};
+    \node[anchor=center] at (60pt,30pt) {$5.55$};
+    \node[anchor=center] at (90pt,60pt) {$5.00$};
+    %\node[anchor=center] at (90pt,0pt) {$0.33$};
+    \node[anchor=center] at (120pt,30pt) {$4.12$};
+    %\node[anchor=center] at (150pt,0pt) {$-0.82$};
+
+    \draw[gray, fill=gray] (0pt,120pt) circle (0.25ex);
+    \draw[gray, fill=gray] (0pt,60pt) circle (0.25ex);
+    \draw[gray, fill=gray] (0pt,30pt) circle (0.25ex);
+    \draw[gray, fill=gray] (30pt,90pt) circle (0.25ex);
+    \draw[gray, fill=gray] (60pt,60pt) circle (0.25ex);
+    \draw[gray, fill=gray] (90pt,30pt) circle (0.25ex);
+
+    \draw[gray, fill=gray] (30pt,150pt) circle (0.25ex);
+    \draw[gray, fill=gray] (60pt,150pt) circle (0.25ex);
+    \draw[gray, fill=gray] (60pt,120pt) circle (0.25ex);
+    \draw[gray, fill=gray] (90pt,150pt) circle (0.25ex);
+    \draw[gray, fill=gray] (90pt,120pt) circle (0.25ex);
+    \draw[gray, fill=gray] (90pt,90pt) circle (0.25ex);
+    \draw[gray, fill=gray] (120pt,150pt) circle (0.25ex);
+    \draw[gray, fill=gray] (120pt,120pt) circle (0.25ex);
+    \draw[gray, fill=gray] (120pt,90pt) circle (0.25ex);
+    \draw[gray, fill=gray] (120pt,60pt) circle (0.25ex);
+
+    \node[anchor=center] at (160pt,90pt) {\huge $\times$};
+
+    \draw[gray, ultra thick] (193pt,162pt) -- (185pt,162pt) -- (185pt,18pt)  -- (193pt,18pt);
+    \draw[gray, ultra thick] (207pt,162pt) -- (215pt,162pt) -- (215pt,18pt)  -- (207pt,18pt);
+
+    \node[anchor=center] at (200pt,150pt) {\large $x_1$};
+    \node[anchor=center] at (200pt,120pt) {\large $x_2$};
+    \node[anchor=center] at (200pt,90pt) {\large $x_3$};
+    \node[anchor=center] at (200pt,60pt) {\large $x_4$};
+    \node[anchor=center] at (200pt,30pt) {\large $x_5$};
+
+    \node[anchor=center] at (240pt,90pt) {\huge $=$};
+
+    \draw[gray, ultra thick] (273pt,162pt) -- (265pt,162pt) -- (265pt,18pt)  -- (273pt,18pt);
+    \draw[gray, ultra thick] (287pt,162pt) -- (295pt,162pt) -- (295pt,18pt)  -- (287pt,18pt);
+
+    \node[anchor=center] at (280pt,150pt) {$1.00$};
+    \node[anchor=center] at (280pt,120pt) {$6.66$};
+    \node[anchor=center] at (280pt,90pt) {$0.00$};
+    \node[anchor=center] at (280pt,60pt) {$8.25$};
+    \node[anchor=center] at (280pt,30pt) {$3.50$};
+    
+    
+    
+    
+    
+
+\end{tikzpicture}
