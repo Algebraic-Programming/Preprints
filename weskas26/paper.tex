@@ -1,0 +1,172 @@
+
+\documentclass{amsart}
+
+\usepackage{fullpage}
+\usepackage[british]{babel}
+
+\title{What everyone should know about scheduling}
+\author{Papp \and Yzelman \and ...}
+
+\begin{document}
+
+\begin{abstract}
+Scheduling tasks on compute systems of any scale has become ubiqutous,
+and is no longer a specialist topic in computer science and applied mathematics.
+Over the past few years, Huawei has endeavoured further developing the theoretical foundations of scheduling,
+crucially from the perspective that in modern compute systems
+data movement is by far more costly than actual computation.
+%while furthermore system architecture has become increasingly hierarchical.
+These advances have wide-ranging practical implications--
+in areas ranging from parallel system to algorithm design,
+as well as on software, communication layers, and run-time systems.
+The article before you summarises our recent advances,
+outlines the implications in partical terms,
+and translates these to concrete advice on parallel system and software design.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+scheduling is everywhere: CPUs, NPUs, SOCs
+
+scheduling becomes more intricate at scale:
+\begin{itemize}
+	\item multi-die,
+	\item multi-device,
+	\item cloud \& supercomputer scale
+\end{itemize}
+
+computation as a (Hyper)DAG
+
+scheduling is not partitioning
+
+\subsection{Computation model}
+
+PRAM is not sufficient, must cost communication
+
+note that ideally, furthermore: hierarchical
+\begin{itemize}
+	\item hierarchical processor designs, hierarchical nodes, hierarchical networks
+\end{itemize}
+latencies matter (can cite Anastasiadis if ready)
+
+\subsection{Applications}
+
+a summary of where scheduling is applied at present
+\begin{itemize}
+	\item run-time systems, such as OpenMP;
+	\item communication layers, such as MPI, GASNET, others (PRAM/PGAS?);
+	\item within compilers (to various degrees)
+	\item offline system design (e.g., Wireless)
+	\item not meant as an exhaustive list of applications, but rather to index the quite different domains of applicability
+\end{itemize}
+
+
+\section{Scheduling is hard}
+
+explain NP-hardness and approximation factors in layman terms
+
+explain results for single-level scheduling: NP- and APX-hardness
+
+\subsection{Two-level scheduling}
+
+NP-, APX-hardness, counter-examples, arbitrary factors away from optimum
+
+\subsection{Vertical data movement: communication \emph{and} I/O}
+
+Explain difference between horizontal and vertical data movement, and recap past results (H\&K, Savage)
+
+Results on combined models (multi-processor pebbling)
+
+\subsection{Partial computations}
+
+Explain model refinement and summarise results
+
+Determining optimal schedules using ILP formulations at least as hard as the non-partial case (?)
+
+Luckily, similar theoretical tools for lower-bound proving transferred to partial pebbling
+
+Results on FA, GEMM, etc.
+
+
+\section{How to work around hardness}
+
+\subsection{Horizontal data movement}
+
+ the results apply to general scheduling-- work around it by restricting to specific problems or families of problems
+\begin{itemize}
+	\item note some examples: FFT, ALP
+	\item note that irregular problems cannot escape hardness, e.g., SpMV
+\end{itemize}
+
+\subsection{NUMA}
+
+be careful with multi-level (distributed) scheduling
+
+gets worse with more NUMA levels (recap SPAA results)
+
+arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
+\begin{itemize}
+	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
+\end{itemize}
+
+\subsection{Vertical data movement}
+
+This is a much harder problem, solvable to optimality for severely small problems in the general case
+\begin{itemize}
+	\item (point forward to Section on OneStopParallel)
+\end{itemize}
+Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
+
+Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
+
+
+\section{Similar problems, similar results, and solutions}
+
+Partitioning,
+streaming,
+imply the same work-arounds.
+
+
+\section{OneStopParallel}
+
+Describe what OSP contains and aims to provide/support
+
+\subsection{Optimal Scheduling}
+
+Describe ILP-based formulations (don't give the formulations though, keep it high level)
+
+\subsection{Heuristics}
+
+Describe heuristics that are stand-alone and/or part of multi-level / divide-and-conquer approaches in the next section
+
+\subsection{Multi-level}
+
+Describe approaches suitable for cutting up large problems into smaller parts, ILP-based and otherwise
+
+\subsection{Other features}
+
+
+\section{Results}
+
+ Summarise key results from the various publications and applications
+ \begin{itemize}
+	 \item EDA / SpTrsv
+	 \item MoE
+	 \item algorithm-specific parallelisation should be pointed out? (FFT, GEMM, Attention?, etc.)
+ \end{itemize}
+
+
+\section{Conclusion}
+
+For important kernels or classes of computation, nothing beats manual work (yet:)-- lower bounds, trade-off identifications, (poly-)algorithms that achieve them, combined with engineering efforts. Getting bounds though should not be skipped (engineers need to know what to aim for)
+
+Include also mention of OSP-as-a-Service, can deploy in application, or use for testing/exploration
+
+\subsection{Future Work}
+
+Parametric hardness? There was some nice work at SLS26
+
+\end{document}
+
