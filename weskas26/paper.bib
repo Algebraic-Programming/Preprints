@@ -1,4 +1,19 @@
 
+@article{inda01,
+title = {A simple and efficient parallel FFT algorithm using the BSP model},
+journal = {Parallel Computing},
+volume = {27},
+number = {14},
+pages = {1847-1878},
+year = {2001},
+issn = {0167-8191},
+doi = {https://doi.org/10.1016/S0167-8191(01)00118-1},
+url = {https://www.sciencedirect.com/science/article/pii/S0167819101001181},
+author = {Márcia A. Inda and Rob H. Bisseling},
+keywords = {Fast Fourier transform, Bulk synchronous parallel},
+abstract = {We present a new parallel radix-4 FFT algorithm based on the BSP model. Our parallel algorithm uses the group-cyclic distribution family, which makes it simple to understand and easy to implement. We show how to reduce the communication cost of the algorithm by a factor of 3, in the case that the input/output vector is in the cyclic distribution. We also show how to reduce computation time on computers with a cache-based architecture. We present performance results on a Cray T3E with up to 64 processors, obtaining reasonable efficiency levels for local problem sizes as small as 256 and very good efficiency levels for local sizes larger than 2048.}
+}
+
 @article{valiant90,
 author = {Valiant, Leslie G.},
 title = {A bridging model for parallel computation},
@@ -112,7 +127,93 @@ booktitle = {Proceedings of the 41st International Conference on Machine Learnin
   publisher={Elsevier}
 }
 
+@article{mccoll99,
+	author = {McColl, W. F. and Tiskin, A.},
+	year = 1999,
+	title = "Memory-Efficient Matrix Multiplication in the {BSP} Model",
+	journal = "Algorithmica",
+	pages = {287--297},
+	issue = 3,
+	volume = 24,
+	abstract = "The model of bulk-synchronous parallel (BSP) computation is an emerging paradigm of general-purpose parallel computing. Its modification, the BSPRAM model, allows one to combine the advantages of distributed and shared-memory style programming. In this paper we study the BSP memory complexity of matrix multiplication. We propose new memory-efficient BSP algorithms both for standard and for fast matrix multiplication. The BSPRAM model is used to simplify the description of the algorithms. The communication and synchronization complexity of our algorithms is slightly higher than that of known time-efficient BSP algorithms. The current time-efficient and new memory-efficient algorithms are connected by a continuous tradeoff.",
+	issn = {1432-0541},
+	url = {https://doi.org/10.1007/PL00008264},
+	doi = {10.1007/PL00008264}
+}
 
+@article{irony04,
+title = {Communication lower bounds for distributed-memory matrix multiplication},
+journal = {Journal of Parallel and Distributed Computing},
+volume = {64},
+number = {9},
+pages = {1017-1026},
+year = {2004},
+issn = {0743-7315},
+doi = {https://doi.org/10.1016/j.jpdc.2004.03.021},
+url = {https://www.sciencedirect.com/science/article/pii/S0743731504000437},
+author = {Dror Irony and Sivan Toledo and Alexander Tiskin},
+keywords = {Communication, Lower bounds, Distributed memory, Matrix multiplication},
+abstract = {We present lower bounds on the amount of communication that matrix multiplication algorithms must perform on a distributed-memory parallel computer. We denote the number of processors by P and the dimension of square matrices by n. We show that the most widely used class of algorithms, the so-called two-dimensional (2D) algorithms, are optimal, in the sense that in any algorithm that only uses O(n2/P) words of memory per processor, at least one processor must send or receive Ω(n2/P1/2) words. We also show that algorithms from another class, the so-called three-dimensional (3D) algorithms, are also optimal. These algorithms use replication to reduce communication. We show that in any algorithm that uses O(n2/P2/3) words of memory per processor, at least one processor must send or receive Ω(n2/P2/3) words. Furthermore, we show a continuous tradeoff between the size of local memories and the amount of communication that must be performed. The 2D and 3D bounds are essentially instantiations of this tradeoff. We also show that if the input is distributed across the local memories of multiple nodes without replication, then Ω(n2) words must cross any bisection cut of the machine. All our bounds apply only to conventional Θ(n3) algorithms. They do not apply to Strassen's algorithm or other o(n3) algorithms.}
+}
+
+@article{aggarwal90,
+title = {Communication complexity of PRAMs},
+journal = {Theoretical Computer Science},
+volume = {71},
+number = {1},
+pages = {3-28},
+year = {1990},
+issn = {0304-3975},
+doi = {https://doi.org/10.1016/0304-3975(90)90188-N},
+url = {https://www.sciencedirect.com/science/article/pii/030439759090188N},
+author = {Alok Aggarwal and Ashok K. Chandra and Marc Snir},
+abstract = {We propose a model, LPRAM, for parallel random access machines with local memory that captures both the communication and computational requirements in parallel computation. For this model, we present several interesting results, including the following: Two n × n matrices can be multiplied in 0(n3/p) computation time and 0(n2/p23) communication steps using p processors (for p = 0(n3/log32 n)). Furthermore, these bounds are optimal for arithmetic on semirings (using +, × only). It is shown that any algorithm that uses comparisons only and that sorts n words requires Ω(n log n/(p log(n/p))) communication steps for 1 < p < n. We also provide an algorithm that sorts n words and uses (-)(n log n/p) computation time and (-)(n log n/p log(n/p))) communication steps. These bounds also apply for computing an n-point FFT graph. It is shown that computing any binary tree τ with n nodes and height h requires Ω(n/p + log n + √h) communication steps, and can always be computed in 0(n/p + min(√n, h)) steps. We also present a simple linear-time algorithm that generates a schedule for computing τ in at most 2Dopt(τ) steps, where Dopt(τ) represents the minimum communication delay for computing τ. It is also shown that various problems that are expressed as DAGs exhibit a communication-delay/computation-time trade-off.}
+}
+
+@article{bernsten89,
+title = {Communication efficient matrix multiplication on hypercubes},
+journal = {Parallel Computing},
+volume = {12},
+number = {3},
+pages = {335-342},
+year = {1989},
+issn = {0167-8191},
+doi = {https://doi.org/10.1016/0167-8191(89)90091-4},
+url = {https://www.sciencedirect.com/science/article/pii/0167819189900914},
+author = {Jarle Berntsen},
+keywords = {Matrix multiplication, hypercubes, communication overhead, block algorithms},
+abstract = {In a recent paper Fox, Otto and Hey consider matrix algorithms for hypercubes. For hypercubes allowing pipelined broadcast of messages they present a communication efficient algorithm. We present in this paper a similar algorithm that uses only nearest neighbour communication. This algorithm will therefore by very communication efficient also on hypercubes not allowing pipelined broadcast. We introduce a new algorithm that reduces the asymptotic communication cost from 2(N2/P12)β to 3(N2/P23)β. This is achieved by regarding the hypercube as a set of subcubes and by using the cascade sum algorithm.}
+}
+
+@inproceedings{papadimitriou88,
+author = {Papadimitriou, Christos and Yannakakis, Mihalis},
+title = {Towards an architecture-independent analysis of parallel algorithms},
+year = {1988},
+isbn = {0897912640},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/62212.62262},
+doi = {10.1145/62212.62262},
+booktitle = {Proceedings of the Twentieth Annual ACM Symposium on Theory of Computing},
+pages = {510–513},
+numpages = {4},
+location = {Chicago, Illinois, USA},
+series = {STOC '88}
+}
+
+@article{dekel81,
+author = {Dekel, Eliezer and Nassimi, David and Sahni, Sartaj},
+title = {Parallel Matrix and Graph Algorithms},
+journal = {SIAM Journal on Computing},
+volume = {10},
+number = {4},
+pages = {657-675},
+year = {1981},
+doi = {10.1137/0210049},
+URL = { https://doi.org/10.1137/0210049 },
+eprint = { https://doi.org/10.1137/0210049 },
+abstract = { Matrix multiplication algorithms for cube connected and perfect shuffle computers are presented. It is shown that in both these models two \$n \times n\$ matrices can be multiplied in \$O(n/m + \log m)\$ time when \$n^2 m\$, \$1 \leqq m \leqq n\$, processing elements (PEs) are available. When only \$m^2 \$, \$1 \leqq m \leqq n\$, PEs are available, two \$n \times n\$ matrices can be multiplied in \$O(n^2/m + m(n/m)^{2.61} )\$ time. It is shown that many graph problems can be solved efficiently using the matrix multiplication algorithms. }
+}
 
 @misc{copt,
   author={Dongdong Ge and Qi Huangfu and Zizhuo Wang and Jian Wu and Yinyu Ye},
@@ -120,5 +221,4 @@ booktitle = {Proceedings of the 41st International Conference on Machine Learnin
   howpublished={https://guide.coap.online/copt/en-doc},
   year=2023
 }
-
 

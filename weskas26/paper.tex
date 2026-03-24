@@ -4,6 +4,8 @@
 \usepackage{fullpage}
 \usepackage[british]{babel}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 % For checking overfull boxes -- Comment in final version
 \overfullrule=5pt
@@ -120,20 +122,21 @@ However, we also emphasize that in general, partial computations can enable sign
 
 \section{Avoiding hardness}
 
-While general scheduling is hard in a variety of realistic models,
-scheduling in practice works around these limitations in a variety of ways.
+While general scheduling while taking into account realistic costs is hard as outlined in the preceding section,
+scheduling in practice works around hardness in a variety of ways.
 We index common approaches along the following practical use cases:
 \begin{enumerate}
 	\item minimise horizontal data movement (communication);
 	\item minimise vertical data movement (I/O); and
 	\item minimise data movement through NUMA hierarchies.
 \end{enumerate}
-The approaches described below include proven techniques by which the high-performance computing (HPC) community has operated in the last few decades,
-such as proving optimality for specific problems or specific classes of problems,
-as opposed to attempting to find solutions that work in the most generic cases.
+We focus on proven techniques by which the high-performance computing (HPC) community has operated in the last few decades,
+which principially considers proving optimality for specific problems or specific classes of problems,
+and discovering parallel algorithms that achieve these bounds.
 %Such problem-specific approaches have reliably led to algorithms and software that indeed achieve optimal performance in practice.
+This approach stands in stark contrast to finding solutions that work in the most generic cases.
 We couple outlining these state-of-the-art methodologies with novel insights from our research,
-and close with practical implications to parallel frameworks for AI and beyond,
+and discuss practical implications to parallel frameworks for AI and beyond,
 run-time system design for modern large-scale compute infrastructures,
 and insights tailored to the complex case of irregular computations.
 
@@ -141,14 +144,13 @@ and insights tailored to the complex case of irregular computations.
 
 Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation.
 One such model, the Bulk Synchronous Parallel (BSP) model, %developed during the late 80s,
-comes with two modes of operation, %:
+comes with two modes of operation, one automatic and one manual~\cite{valiant90}. %:
 %one automatic, where programs are expressed sequentially and through hashing of program data, executable in parallel in a fully scalable fashion; and
-%one manual, 
-one of which is the manual mode
-where programs explicitly coordinate computation and communication%, and potentially differ at different processes
-~\cite{valiant90}.
-In both cases, the cost model revolves not only around work-- but also supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models} for details.
-Costs are typically parametrised in the number of processors $p$ available and some problem-specific parameter $\vec{n}$, such as a problem size.
+%one manual, where programs explicitly coordinate computation and communication%, and potentially differ at different processes
+%~\cite{valiant90}.
+In both cases, the cost model revolves not only around work,
+but also around supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models} for details.
+Costs are typically parametrised in the number of processors $p$ and some problem-specific parameter $n$, such as a problem size.
 %To recall, the related system parameters are $g$, the cost of sending one word, and $l$, the cost of moving from one superstep to the next-- principially, making sure that any necessary communications are completed before continuing, and $p$, the number of processing units in the parallel system.
 %Compute costs are hence expressed in terms of $g$ and $l$, while parameterised in $p$ and some problem size $n$.
 %AJ: check later if we do indeed need to recall more of these definitions
@@ -156,13 +158,108 @@ The key phrase here is \emph{problem-specific}: in HPC, by far most known algori
 %By contrast, most highly scalable big-data frameworks instead operate by automatic-mode BSP, and achieve an \emph{expected} cost of $\mathcal{O}(n/p)$, where $n$ here could be taken as proportional to the number of data accesses the sequential program requires.
 We give two examples, fast Fourier transformation (FFT) and matrix multiplication, and demonstrate how optimal algorithms and optimal trade-offs may be derived.
 
-\subsubsection*{FFT}
+\subsubsection*{Fast Fourier transforms and butterfly DAGs}
 
-introduce notion of immortal algorithms
+\begin{figure}
+	\centering
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.45\textwidth]{pdf/fft-8}
+		\caption{Directed acyclic graph representation of a fast Fourier transform on an input of length eight. Connections should be read from left to right.}
+		\label{fig:fft-8}
+	\end{subfigure}%
+	\hspace{2em}%
+	\begin{subfigure}[t]{0.45\textwidth}
+		\centering
+		\includegraphics[width=0.45\textwidth]{pdf/fft-n8-p2}
+		\caption{A two-processor parallelisation assigns vertices to a blue or red processor. An orange line indicates cut edges that require communication.} 
+		\label{fig:fft-n8-p2}
+	\end{subfigure}
+	\caption{Butterfly graphs and their application to fast Fourier transforms.}
+\end{figure}
+
+Consider the visual representation of a one-dimensional FFT of length $n=8$ depicted in Figure~\ref{fig:fft-8}.
+This so-called \emph{butterfly graph} consists of three phases, and of $\log n$ phases for general $n$.
+When distributing the computation over multiple processors, different vertices are assigned to different processes.
+Edges between vertices assigned to different processors induce communication between processes.
+By cutting the graph horizontally, we visually confirm the computation may proceed embarrasingly parallel for the first phase up to $p\leq4$,
+while the first two phases may be computed concurrently for up to $p\leq2$ processors.
+Figure~\ref{fig:fft-n8-p2} visualises the latter,
+from which we observe that this particular DAG partitioning results in exactly $n$ cut edges.
+The communication from phase two to three furthermore is balanced amongst the processors--
+the communication cost hence is proportional to $n/p$,
+while the number of supersteps is one and processor-local work is proportional to $(n\log n)/p$.
+The above arguments that reason about a fixed butterfly DAG structure extend to an achievable lower bound for general $n$~\cite{papadimitriou88,valiant90,inda01}.%,
+%and may apply to other models of computation as well~\cite{papadimitriou88}.
+
+Given that the sequential FFT algorithm has a work cost proportional to $n\log n$
+--and any computation that maps to a butterfly graph a work cost that is \emph{at least} proportional to $n\log n$--
+the total parallelisation cost of $(n\log n)/p$ is optimal%
+\footnote{assuming the work associated with each vertex has homogeneous cost
+and that $p$ is large enough compared to $n$},
+and any computation that maps to a butterfly graph can be optimally parallelised
+by this singular lower-bound analysis and parallelisation recipe.
+Colloquially, algorithms backed by (or resulting from) such proofs of optimality are known as \emph{immortal} algorithms.
 
 \subsubsection*{Matrix--matrix multiplication}
 
-introduce notion of polyalgorithms
+\begin{figure}
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=.9\textwidth]{pdf/gemm-n4}
+		\caption{The computational DAG for multiplying two $4\times4$ matrices.}
+		\label{fig:gemm-n4}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=.9\textwidth]{pdf/gemm-n4-p8}
+		\caption{Communication-optimal work distribution over eight processors.}
+		\label{fig:gemm-n4-p8}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\raisebox{1em}{\includegraphics[width=.7\textwidth]{pdf/2d-block}}
+		\caption{A 2D block distribution resulting in memory-optimal multiplication.}
+		\label{fig:2d-block}
+	\end{subfigure}
+	\caption{Cube graphs and their application to matrix--matrix multiplication.}
+\end{figure}
+
+Let us consider two matrices $A, B$ both of size $n\times n$, and the matrix--matrix multiplication $C=AB$.
+Figure~\ref{fig:gemm-n4} depicts the resulting DAG for $n=4$, where,
+for example, the matrix $A$ could span the horizontal and vertical axes (the front of the cube),
+the matrix $B$ the horizontal and depth axes (the top of the cube),
+and the output matrix $C$ the vertical and depth axes (the side of the cube)--
+in which case the direction of the horizontally-oriented edges would face towards $C$,
+while the depth- and vertically-oriented edges would face \emph{away} from $A$ and $B$, respectively.
+All vertices shown correspond to multiplications $a_{ik}b_{kj}$ of the canonical triple-loop matrix--matrix multiplication algorithm,
+which, along the edges towards $C$, are summed into the output $c_{ij}$.
+
+In the same vein as for the FFT,
+we may construct a parallel algorithm by exploiting the geometric features of the resulting cube DAG.
+While coloring vertices to specific processors, again edges between differently-coloured nodes will induce communication.
+Therefore the work distribution that minimises communication is one that minimises such cuts,
+which in the case of a cube means identifying $p$ volumes for which the surface areas (where edge cuts occur) are minimised.
+Figure~\ref{fig:gemm-n4-p8} exemplifies such a distribution,
+which achieves a communication cost proportional to $(n/p^{1/3})^2=n^2/p^{2/3}$ in two supersteps:
+first, every input from $A$ and $B$ are spread out over $p^{1/3}$ processors while
+second, every output in $C$ is accumulated from partial results of $p^{1/3}$ processors.
+In-between, a process-local sequential multiplication takes place that costs $(n/p^{1/3})^3=n^3/p$ work per processor,
+which is work-optimal as well.
+The above geometric argument is extensible to a formal proof of optimality in terms of horizontal data movement for general $n$%
+\footnote{again, for large enough $n$ compared to $p$},
+and practical algorithms that achieve this bound exist~\cite{dekel81,bernsten89,aggarwal90,mccoll99,irony04}.
+
+However, the result is not an immortal algorithm per se:
+while the algorithm is communication- and work-optimal, its processor-local memory requirement is proportional to $n^2/p^{2/3}$,
+which is larger than the ideal bound of $n^2/p$.
+By subdividing the matrices $A$, $B^T$, and $C$ using a standard 2D block distribution depicted in Figure~\ref{fig:2d-block},
+a work- and memory-optimal algorithm with costs proportional to $n^3/p$ and $n^2/p$, respectively, may be constructed.
+Indeed such algorithms are not communication-optimal, however, as processors need to communicate $\sqrt{P}-1$ blocks of size $n^2/p$,
+for a total communication cost proportional to $n^2/p^{1/2}$, which is higher than $n^2/p^{2/3}$.
+In fact, there is a discrete trade-off space between communication- and memory-optimality,
+resulting into an immortal algorithm that exposes an explicit trade-off parameter~\cite{mccoll99}.
+An algorithm that adapts to run-time conditions such as system parameters $p$, $g$, $l$, or available memory, is known as a \emph{poly-algorithm}.
 
 \subsubsection*{Generalisability}
 
