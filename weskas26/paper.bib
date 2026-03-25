@@ -185,6 +185,60 @@ keywords = {Matrix multiplication, hypercubes, communication overhead, block alg
 abstract = {In a recent paper Fox, Otto and Hey consider matrix algorithms for hypercubes. For hypercubes allowing pipelined broadcast of messages they present a communication efficient algorithm. We present in this paper a similar algorithm that uses only nearest neighbour communication. This algorithm will therefore by very communication efficient also on hypercubes not allowing pipelined broadcast. We introduce a new algorithm that reduces the asymptotic communication cost from 2(N2/P12)β to 3(N2/P23)β. This is achieved by regarding the hypercube as a set of subcubes and by using the cascade sum algorithm.}
 }
 
+@article{popovici20,
+ author = {Popovici, Doru Thom and Schatz, Martin D. and Franchetti, Franz and Low, Tze Meng},
+ title = {A Flexible Framework for Multidimensional DFTs},
+ journal = {SIAM Journal on Scientific Computing},
+ volume = {42},
+ number = {5},
+ pages = {C245-C264},
+ year = {2020},
+ doi = {10.1137/19M1288401},
+ URL = { https://doi.org/10.1137/19M1288401 },
+ eprint = { https://doi.org/10.1137/19M1288401 },
+ abstract = { Multidimensional discrete Fourier transforms (DFTs) are typically decomposed into multiple one-dimensional (1D) transforms. Hence, parallel implementations of any multidimentional DFT focus on parallelizing within or across the 1D DFT. Existing DFT packages exploit the inherent parallelism across the 1D DFTs and offer rigid frameworks, that cannot be extended to incorporate both forms of parallelism and various data layouts to enable some of the parallelism. However, in the era of exascale, where systems have thousand of nodes and intricate network topologies, flexibility and parallel efficiency are key aspects all multidimentional DFT frameworks need to have in order to map and scale the computation appropriately. In this work, we show the need for a versatile parallel framework that facilitates the development of a family of parallel multidimentional DFT algorithms by (1) using different data layouts to distribute the data across the compute nodes, (2) exploiting the two different parallelization schemes to different degrees, and (3) unifying the two parallelization schemes within a single framework. We show that the flexibility of selecting different parallel multidimentional DFT algorithms allows for almost linear strong scaling results for problem sizes of \$1024^3\$ on two supercomputers, namely, RIKEN's K-Computer and Oakridge's Summit. }
+}
+
+@article{koopman25,
+  title={Category Theory for Supercomputing: The Tensor Product of Linear BSP Algorithms},
+  author={Koopman, Thomas and Bisseling, Rob H and Scholz, Sven-Bodo},
+  journal={arXiv preprint arXiv:2510.00979},
+  year={2025}
+}
+
+@article{koopman23,
+  title={Minimizing communication in the multidimensional FFT},
+  author={Koopman, Thomas and Bisseling, Rob H},
+  journal={SIAM Journal on Scientific Computing},
+  volume={45},
+  number={6},
+  pages={C330--C347},
+  year={2023},
+  publisher={SIAM}
+}
+
+@article{tiskin02,
+  author={Tiskin, A.},
+  title={Bulk-synchronous parallel Gaussian elimination},
+  journal={Journal of Mathematical Sciences},
+  volume={108},
+  number={6},
+  pages={977--991},
+  year={2002},
+  publisher={Springer}
+}
+
+@article{gerbessiotis94,
+  title={Direct bulk-synchronous parallel algorithms},
+  author={Gerbessiotis, Alexandros V and Valiant, Leslie G},
+  journal={Journal of parallel and distributed computing},
+  volume={22},
+  number={2},
+  pages={251--267},
+  year={1994},
+  publisher={Elsevier}
+}
+
 @inproceedings{papadimitriou88,
 author = {Papadimitriou, Christos and Yannakakis, Mihalis},
 title = {Towards an architecture-independent analysis of parallel algorithms},
@@ -213,6 +267,32 @@ doi = {10.1137/0210049},
 URL = { https://doi.org/10.1137/0210049 },
 eprint = { https://doi.org/10.1137/0210049 },
 abstract = { Matrix multiplication algorithms for cube connected and perfect shuffle computers are presented. It is shown that in both these models two \$n \times n\$ matrices can be multiplied in \$O(n/m + \log m)\$ time when \$n^2 m\$, \$1 \leqq m \leqq n\$, processing elements (PEs) are available. When only \$m^2 \$, \$1 \leqq m \leqq n\$, PEs are available, two \$n \times n\$ matrices can be multiplied in \$O(n^2/m + m(n/m)^{2.61} )\$ time. It is shown that many graph problems can be solved efficiently using the matrix multiplication algorithms. }
+}
+
+@unpublished{petitet16,
+ title={A BSP Scalability Analysis of 3D LU Factorization with Row Partial Pivoting},
+ author={Petitet, A.},
+ note={SIAM Conference on Parallel Processing for Scientific Computing (PP16)},
+ year=2016,
+ month="April",
+ url={https://meetings.siam.org/sess/dsp_talk.cfm?p=73747}
+}
+
+@inproceedings{ballard18,
+  title={A 3d parallel algorithm for qr decomposition},
+  author={Ballard, Grey and Demmel, James and Grigori, Laura and Jacquelin, Mathias and Knight, Nicholas},
+  booktitle={Proceedings of the 30th on Symposium on Parallelism in Algorithms and Architectures},
+  pages={55--65},
+  year={2018}
+}
+
+@inproceedings{sao18,
+  title={A communication-avoiding 3D LU factorization algorithm for sparse matrices},
+  author={Sao, Piyush and Li, Xiaoye Sherry and Vuduc, Richard},
+  booktitle={2018 IEEE International Parallel and Distributed Processing Symposium (IPDPS)},
+  pages={908--919},
+  year={2018},
+  organization={IEEE}
 }
 
 @misc{copt,

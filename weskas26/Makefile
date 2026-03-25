@@ -11,7 +11,7 @@ pdf/%.pdf: eps/%.eps
 	mkdir pdf || true
 	epstopdf "$<" "--outfile=$@"
 
-pdf-illustrations: pdf/fft-8.pdf pdf/fft-n8-p2.pdf pdf/gemm-n4.pdf pdf/gemm-n4-p8.pdf pdf/2d-block.pdf
+pdf-illustrations: pdf/fft-8.pdf pdf/fft-n8-p2.pdf pdf/gemm-n4.pdf pdf/gemm-n4-p8.pdf pdf/gemm-n4-p4.pdf
 
 paper.bbl: paper.aux paper.bib
 	bibtex paper

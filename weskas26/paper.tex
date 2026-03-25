@@ -191,6 +191,7 @@ We give two examples, fast Fourier transformation (FFT) and matrix multiplicatio
 		\label{fig:fft-n8-p2}
 	\end{subfigure}
 	\caption{Butterfly graphs and their application to fast Fourier transforms.}
+	\label{fig:butterfly-DAGs}
 \end{figure}
 
 Consider the visual representation of a one-dimensional FFT of length $n=8$ depicted in Figure~\ref{fig:fft-8}.
@@ -233,11 +234,11 @@ Colloquially, algorithms backed by (or resulting from) such proofs of optimality
 	\end{subfigure}
 	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
-		\raisebox{1em}{\includegraphics[width=.7\textwidth]{pdf/2d-block}}
-		\caption{A 2D block distribution resulting in memory-optimal multiplication.}
-		\label{fig:2d-block}
+		\includegraphics[width=.9\textwidth]{pdf/gemm-n4-p4}
+		\caption{Memory-optimal work distribution over four processors.}
+		\label{fig:gemm-n4-p4}
 	\end{subfigure}
-	\caption{Cube graphs and their application to matrix--matrix multiplication.}
+	\caption{Cube graphs of size $4\times4\times4$ and their application to matrix--matrix multiplication.}
 \end{figure}
 
 Let us consider two matrices $A, B$ both of size $n\times n$, and the matrix--matrix multiplication $C=AB$.
@@ -265,24 +266,52 @@ The above geometric argument is extensible to a formal proof of optimality in te
 \footnote{again, for large enough $n$ compared to $p$},
 and practical algorithms that achieve this bound exist~\cite{dekel81,bernsten89,aggarwal90,mccoll99,irony04}.
 
-However, the result is not an immortal algorithm per se:
-while the algorithm is communication- and work-optimal, its processor-local memory requirement is proportional to $n^2/p^{2/3}$,
-which is larger than the ideal bound of $n^2/p$.
-By subdividing the matrices $A$, $B^T$, and $C$ using a standard 2D block distribution depicted in Figure~\ref{fig:2d-block},
-a work- and memory-optimal algorithm with costs proportional to $n^3/p$ and $n^2/p$, respectively, may be constructed.
-Indeed such algorithms are not communication-optimal, however, as processors need to communicate $\sqrt{P}-1$ blocks of size $n^2/p$,
-for a total communication cost proportional to $n^2/p^{1/2}$, which is higher than $n^2/p^{2/3}$.
-In fact, there is a discrete trade-off space between communication- and memory-optimality,
-resulting into an immortal algorithm that exposes an explicit trade-off parameter~\cite{mccoll99}.
-An algorithm that adapts to run-time conditions such as system parameters $p$, $g$, $l$, or available memory, is known as a \emph{poly-algorithm}.
+\subsubsection*{Parametrisation and poly-algorithms} The resulting so-called 3D algorithm for matrix multiplication, however, is not an immortal algorithm:
+while communication- and work-optimal, the processor-local memory requirement is proportional to $n^2/p^{2/3}$--
+larger than the ideal bound of $n^2/p$.
+Subdividing the matrices $A$, $B^T$, and $C$ into $p$ square blocks results in the so-called 2D algorithms,
+which are work- and memory-optimal with costs proportional to $n^3/p$ and $n^2/p$, respectively.
+Such algorithms are not communication-optimal, however,
+as processors need to communicate $\sqrt{p}-1$ blocks of size $n^2/p$ over $\sqrt{p}-1$ supersteps to maintain memory optimality.
+%The sum of communication costs are proportional to $n^2/p^{1/2}$, which is higher than $n^2/p^{2/3}$.
+Figure~\ref{fig:gemm-n4-p4} depicts the resulting work distribution for $n=p=4$,
+which visualises a higher surface-to-volume ratio compared to the 3D algorithm,
+leading to a suboptimal communication cost.
+
+The existence of both 2D and 3D algorithms points to a discrete trade-off space between communication- and memory-optimality,
+indeed confirmed through lower-bound studies~\cite{irony04}.
+This, in turn,
+identifies an opportunity for programs to, when available,
+use more memory in order to reduce communication.
+These decisions may be made automatically at run-time.
+To realise this, algorithms must first be \emph{parametrised} not only in $p$, but also in $g$, $l$, and available system memory.
+A thus-parametrised \emph{poly-algorithm} may then dispatch,
+at run-time,
+to the best-possible algorithmic variant-- whether that is 2D, 3D, or something in-between.
+In the case of matrix multiplication,
+an immortal such poly-algorithm,
+capable of optimally traversing the memory-communication trade-off,
+is indeed realisable~\cite{mccoll99}.
 
 \subsubsection*{Generalisability}
 
-positive: these are tried an tested approaches. negative: needs human in the loop
+Analysing specific problems and classes of problems through their DAG structure are well-known,
+tried and tested approaches,
+applicable to a wide range of problems.
+Common DAG structures not discussed here include diamond DAGs for e.g.\ matrix decompositions~\cite{tiskin02,petitet16,sao18,ballard18} and $k$-ary trees for e.g.\ broadcasts~\cite{papadimitriou88,gerbessiotis94},
+while the analysis on cube DAGs can straightforwardly be extended to $d$-dimensional hyper-cubes for capturing, e.g., tensor contractions.
 
-novel approaches that automate usage of these insights, e.g., ALP
-
-note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
+However,
+applying these approaches requires a human in the loop,
+oftentimes needing significant expertise.
+Consider, for example, multi-dimensional FFTs,
+for which the de-facto standard today applies 1D FFTs in different directions,
+requiring data transpositions between directions when executing in parallel~\cite{popovici20}.
+This again corresponds to butterfly DAGs as in Figure~\ref{fig:butterfly-DAGs},
+and by repeating the argument for 1D FFTs,
+a lower bound of $n/p$ data movement in $1$ superstep again emerges-- even for higher-dimensional FFTs~\cite{valiant90}.
+However, a practical algorithm that matches these bounds was only recently discovered, more than three decades later~\cite{koopman23},
+and required concepts from category theory to formulate~\cite{koopman25}.
 
 \subsection{Vertical data movement}
 
@@ -307,9 +336,13 @@ Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses an
 
 \subsection{Parallel frameworks and run-time systems}
 
+novel approaches that automate usage of the above insights, e.g., ALP
+
 A section on general advice for parallel frameworks and run-time systems
 
 \subsection{Irregular computations}
+
+note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
 
 Index good approaches for problems that are inherently irregular (and thus cannot, to significant degree, avoid hardness)
 
