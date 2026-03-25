@@ -1,11 +1,25 @@
-
-\documentclass{amsart}
+\documentclass[oneside,reqno, a4paper]{amsart}
 
 \usepackage{fullpage}
 \usepackage[british]{babel}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{graphicx}
 \usepackage{subcaption}
+
+% Equations, Tables, and Figures have numbering within section
+\usepackage{chngcntr}
+\numberwithin{equation}{section}
+\counterwithin{table}{section}
+\counterwithin{figure}{section}
+
+% Hyperrefs
+\usepackage{url}
+\usepackage[hyperfootnotes=false, colorlinks, citecolor= RoyalBlue, urlcolor=blue, linkcolor=blue ]{hyperref}
+
+% Floats within section
+\usepackage{placeins}
+\let\Oldsection\section
+\renewcommand{\section}{\FloatBarrier\Oldsection}
 
 % For checking overfull boxes -- Comment in final version
 \overfullrule=5pt
@@ -19,6 +33,7 @@
 
 \title{What everyone should know about scheduling computations}
 \author{Papp, P. A. \and Yzelman, A. N. \and Steiner, R. S. \and ...}
+\date{\today}
 
 \begin{document}
 
