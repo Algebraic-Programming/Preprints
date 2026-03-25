@@ -262,8 +262,9 @@ first, every input from $A$ and $B$ are spread out over $p^{1/3}$ processors whi
 second, every output in $C$ is accumulated from partial results of $p^{1/3}$ processors.
 In-between, a process-local sequential multiplication takes place that costs $(n/p^{1/3})^3=n^3/p$ work per processor,
 which is work-optimal as well.
-The above geometric argument is extensible to a formal proof of optimality in terms of horizontal data movement for general $n$%
-\footnote{again, for large enough $n$ compared to $p$},
+The above geometric argument is extensible to a formal proof of optimality%
+\footnote{again, for large enough $n$ compared to $p$}
+in terms of horizontal data movement for general $n$,
 and practical algorithms that achieve this bound exist~\cite{dekel81,bernsten89,aggarwal90,mccoll99,irony04}.
 
 \subsubsection*{Parametrisation and poly-algorithms} The resulting so-called 3D algorithm for matrix multiplication, however, is not an immortal algorithm:
@@ -278,7 +279,7 @@ Figure~\ref{fig:gemm-n4-p4} depicts the resulting work distribution for $n=p=4$,
 which visualises a higher surface-to-volume ratio compared to the 3D algorithm,
 leading to a suboptimal communication cost.
 
-The existence of both 2D and 3D algorithms points to a discrete trade-off space between communication- and memory-optimality,
+The existence of both 2D and 3D algorithms points to a discrete trade-off space between optimality in communication and memory,
 indeed confirmed through lower-bound studies~\cite{irony04}.
 This, in turn,
 identifies an opportunity for programs to, when available,
@@ -309,7 +310,7 @@ for which the de-facto standard today applies 1D FFTs in different directions,
 requiring data transpositions between directions when executing in parallel~\cite{popovici20}.
 This again corresponds to butterfly DAGs as in Figure~\ref{fig:butterfly-DAGs},
 and by repeating the argument for 1D FFTs,
-a lower bound of $n/p$ data movement in $1$ superstep again emerges-- even for higher-dimensional FFTs~\cite{valiant90}.
+a lower bound of $n/p$ data movement in $1$ superstep again emerges-- even for higher-dimensional FFTs.
 However, a practical algorithm that matches these bounds was only recently discovered, more than three decades later~\cite{koopman23},
 and required concepts from category theory to formulate~\cite{koopman25}.
 
