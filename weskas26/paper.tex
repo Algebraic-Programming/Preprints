@@ -5,6 +5,8 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
 
 % Equations, Tables, and Figures have numbering within section
 \usepackage{chngcntr}
@@ -98,7 +100,14 @@ It has been long known that scheduling is a particularly challenging problem. Th
 
 Besides NP-hardness, there are other concepts that show that the problem is even more challenging; for instance, inapproximability means that it is even NP-hard to find a solution that is close to the optimal value, whereas parameterized complexity studies whether the problem remains hard if some parameters of the input are fixed to a small value.
 
-With the above tools, it has been shown that scheduling is a hard problem even in very simple cases: with unit execution time for all tasks and unit communication delays between the processors, finding the optimal schedule is still NP-hard~\cite{rayward1987uet}. In more realistic settings, like the BSP model, the problem is even more difficult. For instance, the optimal solution is still NP-hard when considering very special classes of DAGs, such as DAGs with only two layers, or in-trees where each vertex has at most one outgoing edge. Moreover, in general DAGs, the optimal cost is even NP-hard to efficiently approximate beyond a specific ratio $(1+\delta)$, for some $\delta>0$; in official terms, the problem does not allow for a so-called Polynomial-Time Approximation Scheme. In fact, in BSP scheduling, even if the assignment of nodes to processors and supersteps is already fixed, the subproblem of scheduling just the necessary communication steps into the communication phases is already NP-hard~\cite{BSP_DAG_opdas}.
+With the above tools, it has been shown that scheduling is a hard problem even in very simple cases: with unit execution time for all tasks and unit communication delays between the processors, finding the optimal schedule is still NP-hard~\cite{rayward1987uet}. In more realistic settings, like the BSP model, the problem is even more difficult. For instance, the optimal solution is still NP-hard when considering very special classes of DAGs, such as DAGs with only two layers, or in-trees where each vertex has at most one outgoing edge (see Figure~\ref{fig:subclasses}). Moreover, in general DAGs, the optimal cost is even NP-hard to efficiently approximate beyond a specific ratio $(1+\delta)$, for some $\delta>0$; in official terms, the problem does not allow for a so-called Polynomial-Time Approximation Scheme. In fact, in BSP scheduling, even if the assignment of nodes to processors and supersteps is already fixed, the subproblem of scheduling just the necessary communication steps into the communication phases is already NP-hard~\cite{BSP_DAG_opdas}.
+
+\begin{figure}
+	\centering
+	\input{tikz/subclasses.tikz}
+	\caption{Illustration of special subclasses of DAGs: in-trees and $2$-layer DAGs. Scheduling in the BSP model is proven to be already hard on these rather simple DAG classes. In contrast to this, in simpler scheduling models, the problem is still efficiently solvable for these particular cases.}
+	\label{fig:subclasses}
+\end{figure}
 
 On the positive side, some theoretically efficient (polynomial-time) algorithms do exists for edge cases, e.g.\ when the DAG only consists of independent chains and the number of processors is small, but these algorithms are also very inefficient in practice~\cite{BSP_DAG_opdas}.
 
@@ -359,9 +368,23 @@ imply the same work-arounds.
 
 Describe what OSP contains and aims to provide/support
 
-\subsection{Optimal Scheduling}
+\subsection{Optimal Scheduling -- ILPs}
 
-Describe ILP-based formulations (don't give the formulations though, keep it high level)
+Given a scheduling problem, the most desirable outcome would be to find the optimal schedule (with an actual guarantee that it is optimal). As we have discussed, this is not possible in general for NP-hard problems. However, this only means that there is no algorithm that efficiently finds the optimum \emph{for every instance}. In practice, even for NP-hard problems, the community has developed very sophisticated tools that still find the optimum relatively fast in many cases, especially in problems derived from practice, which tend to be much more structured than random instances.
+
+One particularly well-studied NP-hard problem is Integer Linear Programming (ILP), which consists of
+\begin{itemize}
+	\item a set of variables, e.g.\ {$x_1$, $x_2$, $x_3$}, some of which might take any real value, whereas others might be restricted to the set of integers, or to the boolean set $\{ 0,1\}$;
+	\item a set of linear inequality (or equality) constraints on these variables, e.g.\ $x_1 \geq 0$, or $x_1 + 3x_2 - 5x_3 \geq -7$;
+	\item a linear objective function on these variables, e.g.\ $2x_1-x_2+4x_3$, which we want to either minimize or maximize.
+\end{itemize}
+If some of the variables are restricted to integers or boolean values, then this problem is NP-hard. What makes ILPs particularly interesting is that due to their general formulation, many combinatorial problems, including scheduling, can be expressed as ILPs. Furthermore, there are numerous highly optimized (open-source and commercial) ILP solvers; for instance, the Cardinal Optimizer (COpt) commercial solver used in OneStopParallel~\cite{copt}. If we find a suitable ILP representation for our scheduling problem, then these ILP solvers can be directly utilized to find optimal schedules.
+
+BSP scheduling indeed has a natural, if somewhat complicated, representation as an ILP. This is organized around binary variables $\textsc{computed}_{v,p,s}$ for each vertex $v$, processor $p$ and superstep $s$, indicating whether vertex $v$ is computed on processor $p$ in superstep $s$. With these variables, we can, for example, create for each vertex $v$ a linear constraint $\sum_p \sum_s \, \textsc{computed}_{v,s,p} = 1$ to express that the vertex must be computed on exactly one processor in exactly one superstep. Other central variables are $\textsc{present}_{v,p,s}$ indicating whether the output of $v$ is present on $p$ by superstep $s$, and $\textsc{sent}_{v,p_1, p_2,s}$ indicating whether the output of $v$ is sent from processor $p_1$ to processor $p_2$ in superstep $s$. Using these variables, one can encode all the validity conditions of a BSP schedule as linear constraints. The ingredients of the BSP cost function can also be expressed with auxiliary variables and constraints, and hence the objective of the resulting ILP is equivalent to minimizing the cost in the corresponding scheduling problem.
+
+Using the ILP solver on this formulation allows to find the optimal schedule for smaller graphs, sometimes up to several hundred nodes. Even on slightly larger graphs, the solver is often able to the find the optimal or close-to-optimal solutions if we can afford to run it for several hours. As such, this ILP-based approach is a very convenient way to find optimal schedules when we have important workloads of smaller size.
+
+Besides finding the optimal solution, one of the main advantages of this approach is adaptability. Even when focusing on BSP-like models, one encounters countless slightly different versions of the scheduling problem in different application domains. For instance, some scheduling problems might have core type restrictions for an architecture with heterogeneous cores; or allow recomputation in order to decrease costs,; or allow to overlap computations and communications. If we have a specialized scheduling algorithm, it often takes significant effort to adapt it from one of these problem variants to another. In contrast, with ILPs, this can usually be solved with minor modifications to the variables and constraints. As such, using ILPs is a very convenient approach to develop scheduling algorithms that can be quickly tailored to a new application domain if desired.
 
 \subsection{Heuristics}
 
