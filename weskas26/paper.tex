@@ -398,14 +398,38 @@ Besides hill climbing, OSP also implements a more sophisticated local search alg
 
 \begin{figure}
 	\centering
-	\input{tikz/hc.tikz}
+	\resizebox{0.55\textwidth}{!}{\input{tikz/hc.tikz}}
 	\caption{Illustration of two possible improvement steps in a local search algorithm: moving the execution of node $v_3$ to processor $2$ in the same superstep, or keeping it on processor $3$, but moving it to (the computation phase of) the next superstep. In hill climbing, a move is only executed if it produces a new schedule that is still valid, and has lower cost than the current schedule.}
 	\label{fig:hc}
 \end{figure}
 
 \subsection{Combined algorithms}
 
-Describe approaches suitable for cutting up large problems into smaller parts, ILP-based and otherwise
+The best method to obtain a high-quality schedule is often to combine several of the algorithms above. In the simplest case, this can simply be a sequential combination: we first obtain an initial solution from a barrier list scheduler, we improve this with a local search algorithm, and then feed this as an initial solution to the ILP solver~\cite{BSP_algos_opdas}. However, there are also more sophisticated ways to use the algorithms above as ingredients in a more complex scheduler.
+
+Besides the algorithms, another vital ingredient in these combined methods are DAG coarseners, which contract smaller clusters of nodes into a single node, while ensuring that the resulting DAG still remains acyclic. The goal of these algorithms is to significantly decrease the size of the DAG, while ideally retaining most of its original structure. In particular, coarseners mostly aim to identify denser cluster of nodes in the DAG that are connected by many or heavy-weighted edges. Merging these clusters into a single node inherently decreases the amount of communication required between processors, and naturally improves data locality.
+
+OSP implements several acyclic coarsening algorithms that can be used as a pre-processing step before applying the schedulers. This idea can also be extended into the so-called multilevel, or coarsen-solve-refine paradigm, which is widely used in hypergraph partitioning~\cite{hMetis,Popp21multilevel}. The key idea here is to begin with a coarsening phase that acyclically coarsens the DAG in several step iteratively. Then in the solving phase, we apply our previous scheduling algorithms to find a good schedule for this (much simpler) coarsened DAG. Finally, in the refinement phase, we extend this schedule to the original, uncoarsened DAG in smaller steps, through a series of DAGs of increasing size. After each uncoarsening step, an iterative improvement algorithm (like local search) is also applied in order to further refine the schedule to better fit the newly uncoarsened part of the DAG. The approach is illustrated in Figure~\ref{fig:multilevel}.
+
+
+\begin{figure}
+	\centering
+	\resizebox{1.0\textwidth}{!}{\input{tikz/multilevel.tikz}}
+	\caption{Illustration of multilevel scheduling: the DAG is first coarsened iteratively to obtain a much smaller DAG. A scheduling algorithm is then applied to this coarse DAG. Finally, the DAG is iteratively uncoarsened to the original DAG. After each uncoarsening step, the schedule is further refined with an iterative improvement (e.g.\ local search) algorithm.}
+	\label{fig:multilevel}
+\end{figure}
+
+
+Similarly, there are also several ways to apply the ILP-based scheduling idea to larger DAGs. For instance, given an already found BSP schedule, we can split it into segments of supersteps (e.g.\ supersteps 1--4, supersteps 5--8, etc.), and represent these as smaller ILP problems, in order to reoptimize and improve specific parts of the schedule. Similarly, the subproblem of scheduling communication steps can be captured as a notably easier ILP problem, which can again allow us to somewhat decrease the total cost (see Figure~\ref{fig:ilp_sched}). While these methods do not guarantee an optimal solution like the full ILP, they provide significant opportunities to improve the schedules for DAGs up to thousands of nodes~\cite{BSP_algos_opdas}.
+
+\begin{figure}
+	\centering
+	\resizebox{0.6\textwidth}{!}{\input{tikz/ilp_sched.tikz}}
+	\caption{Illustration of ILP-based algorithms for BSP scheduling. The methods use an ILP representation to capture (i) the entire scheduling problem, (ii) a smaller segment of supersteps in the schedule, or (iii) the subproblem of optimizing communication steps.}
+	\label{fig:ilp_sched}
+\end{figure}
+
+In an even more advanced approach, we can apply divide-and-conquer algorithms that try to split that problem into several, relatively independent sub-problems. For instance, one can apply an acyclic partitioning algorithm to acyclically split the input DAG into several smaller parts such that the number of edges connecting different parts is as small as possible. A scheduling algorithm (possibly with ILPs) can then find a separate schedule for each of the parts independently, or in a topological order such that it also takes into consideration the sub-schedules developed for previous parts. The sub-schedules are then merged into a single solution in the end, possibly with some post-processing steps or local search algorithms to further improve the combined schedule~\cite{multiBSP_opdas}.
 
 \subsection{Other features}
 
