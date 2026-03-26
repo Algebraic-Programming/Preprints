@@ -71,6 +71,16 @@ computation as a (Hyper)DAG
 
 scheduling is not partitioning
 
+\begin{figure}
+	\centering
+	\resizebox{.47\textwidth}{!}{\input{tikz/part_sched.tikz}}
+	\caption{
+		Here's a picture for "scheduling is not partitioning", if needed. Old description is in comments.
+		%Illustration of a partitioning (top) and a scheduling (bottom) for the same DAG, with $k=2$ processors. The partitioning only assigns the nodes to processors. While the partitioning in the figure is completely balanced (it assigns $9$ nodes to both groups), it does not allow any parallelization due to the precedence constraints: all subtasks of processor $1$ need to be finished before any subtask of processor $2$ can begin. In contrast to this, the scheduling also assigns the nodes to time steps, which happens in larger batches (so-called supersteps) in this figure. In steps $2$ and $4$, the two processors can indeed execute the assigned workloads in a parallel manner.
+	}
+	\label{fig:part_sched}
+\end{figure}
+
 \subsection{Computation model}
 \label{sec:cost-models}
 
@@ -81,6 +91,16 @@ note that ideally, furthermore: hierarchical
 	\item hierarchical processor designs, hierarchical nodes, hierarchical networks
 \end{itemize}
 latencies matter (can cite Anastasiadis if ready)
+
+\begin{figure}
+	\centering
+	\resizebox{0.45\textwidth}{!}{\input{tikz/BSPexample.tikz}}
+	\caption{
+		Here's an example DAG-BSP-schedule picture, if needed. Old descriptions in comments.
+		%Example BSP scheduling of a DAG. In the first computation phase, processor $1$ computes $4$ nodes, while processor $2$ computes $5$ nodes, so the cost of the computation phase is $5$ time units (assuming for simplicity that node weights are uniformly $1$). In the following communication phase, processor $1$ must send $1$ output value, while processor $2$ must send $2$ output values to the other processor, since these are required for the next computation phase. The cost of the communication phase is $2$, multiplied by the time cost of sending a single unit of data.
+	}
+	\label{fig:BSPexample}
+\end{figure}
 
 \subsection{Applications}
 
@@ -337,6 +357,13 @@ be careful with multi-level (distributed) scheduling
 
 gets worse with more NUMA levels (recap SPAA results)
 
+\begin{figure}
+	\centering
+	\resizebox{.4\textwidth}{!}{\input{tikz/numa.tikz}}
+	\caption{Here's a NUMA picture if needed.}
+	\label{fig:numa}
+\end{figure}
+
 arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
 \begin{itemize}
 	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
@@ -362,6 +389,16 @@ Index good approaches for problems that are inherently irregular (and thus canno
 Partitioning,
 streaming,
 imply the same work-arounds.
+
+\begin{figure}
+	\centering
+	\resizebox{.3\textwidth}{!}{\input{tikz/hyper.tikz}}
+	\caption{
+		Here's an example hypergraph partitioning picture, if needed. Old description in comments.
+		%Illustration of a hypergraph with $9$ nodes and $4$ hyperedges. Consider the hyperedge $\{ v_1, v_2, v_3, v_4\}$ on the top. If we have a partitioning where e.g.\ $v_1$ and $v_4$ are assigned to processor $1$, $v_2$ to processor $2$, and $v_3$ to processor $3$, then we have $\lambda_h=3$ for this hyperedge, and hence its cost is $(\lambda_h-1)=2$. Indeed, if the data represented by the hyperedge is stored at processor $2$, for example, then it needs to be sent to two other processors (processors $1$ and $3$), so this hyperedge incurs $2$ communication steps under this partitioning.
+	}
+	\label{fig:hyper}
+\end{figure}
 
 
 \section{OneStopParallel}
@@ -442,6 +479,16 @@ In an even more advanced approach, we can apply divide-and-conquer algorithms th
 	 \item MoE
 	 \item algorithm-specific parallelisation should be pointed out? (FFT, GEMM, Attention?, etc.)
  \end{itemize}
+
+\begin{figure}
+	\centering
+	\resizebox{.42\textwidth}{!}{\input{tikz/sptrsv.tikz}}
+	\caption{
+		Here's an old SpTRSV illustration, if needed. Old caption in comments.
+		%Example for a sparse triangular linear system: we need to solve the equation $A \cdot x = b$ for the vector $x$, with $A$ being a sparse lower triangular matrix (left side) and $b$ being a dense vector (right side). The forward substitution algorithm for the problem allows for a simple and natural DAG representation, and hence our scheduling algorithms can be easily applied to parallelize the computation.
+	}
+	\label{fig:sptrsv}
+\end{figure}
 
 
 \section{Conclusion}

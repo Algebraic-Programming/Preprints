@@ -9,20 +9,20 @@
         \draw[ultra thick, gray, densely dotted] (66pt,28pt) -- (66pt,12pt) -- (117pt,12pt) -- (117pt,28pt) -- cycle;
         \draw[ultra thick, gray, densely dotted] (121pt,22pt) -- (121pt,39pt) -- (137pt,39pt) -- (137pt,22pt) -- cycle;
 
-        \node[anchor=center, gray] at (-20pt,17pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$};
-        \node[anchor=center, gray] at (-20pt,11pt) {\scriptsize \textbf{step }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (-20pt,17pt) {\tiny \textbf{proc }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (-20pt,11pt) {\tiny \textbf{step }$\mathbf{\!1}$};
 
-        \node[anchor=center, gray] at (16.5pt,65pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$, \textbf{step }$\mathbf{\!2}$};
-        \node[anchor=center, gray] at (16.5pt,7pt) {\scriptsize \textbf{proc }$\mathbf{\!2}$, \textbf{step }$\mathbf{\!2}$};
+        \node[anchor=center, gray] at (16.5pt,65pt) {\tiny \textbf{proc }$\mathbf{\!1}$, \textbf{step }$\mathbf{\!2}$};
+        \node[anchor=center, gray] at (16.5pt,7pt) {\tiny \textbf{proc }$\mathbf{\!2}$, \textbf{step }$\mathbf{\!2}$};
 
-        \node[anchor=center, gray] at (53pt,17pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$};
-        \node[anchor=center, gray] at (53pt,11pt) {\scriptsize \textbf{step }$\mathbf{\!3}$};
+        \node[anchor=center, gray] at (53pt,17pt) {\tiny \textbf{proc }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (53pt,11pt) {\tiny \textbf{step }$\mathbf{\!3}$};
 
-        \node[anchor=center, gray] at (91.5pt,65pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$, \textbf{step }$\mathbf{\!4}$};
-        \node[anchor=center, gray] at (91.5pt,7pt) {\scriptsize \textbf{proc }$\mathbf{\!2}$, \textbf{step }$\mathbf{\!4}$};
+        \node[anchor=center, gray] at (91.5pt,65pt) {\tiny \textbf{proc }$\mathbf{\!1}$, \textbf{step }$\mathbf{\!4}$};
+        \node[anchor=center, gray] at (91.5pt,7pt) {\tiny \textbf{proc }$\mathbf{\!2}$, \textbf{step }$\mathbf{\!4}$};
 
-        \node[anchor=center, gray] at (129pt,17pt) {\scriptsize \textbf{proc }$\mathbf{\!1}$};
-        \node[anchor=center, gray] at (129pt,11pt) {\scriptsize \textbf{step }$\mathbf{\!5}$};
+        \node[anchor=center, gray] at (129pt,17pt) {\tiny \textbf{proc }$\mathbf{\!1}$};
+        \node[anchor=center, gray] at (129pt,11pt) {\tiny \textbf{step }$\mathbf{\!5}$};
 	
 	%---
 	
