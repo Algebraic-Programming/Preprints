@@ -470,6 +470,14 @@ In an even more advanced approach, we can apply divide-and-conquer algorithms th
 
 \subsection{Other features}
 
+Besides having a wide range of schedulers, OSP also ensures that these schedulers can be used in different variants of the scheduling problem. For instance, most algorithms can directly optimize for communication costs with NUMA effects, or consider processor type restrictions in a heterogeneous architecture, where vector and tensor operations must be assigned to vector and tensor cores, respectively. There are also complex heuristics to introduce replication steps into a schedule to further decrease communication costs, or to try to overlap computation and communication steps in an existing schedule.
+
+Apart from the algorithms themselves, OSP also has a range of further features to support the study of scheduling problems. It incorporates a test suite to evaluate the algorithms, tools that allow to visualize the input DAGs or the developed schedules, and file readers/writers in several different formats to load the the input DAGs and save the output schedules.
+
+TODO add an image of a visualized schedule here?
+
+TODO mention partitioning, pebbling algorithms? Spectral stuff? Ubuntu /Spack package? 
+
 
 \section{Results}
 
