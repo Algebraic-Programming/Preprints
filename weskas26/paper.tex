@@ -173,6 +173,7 @@ However, even if the optimal schedules are essentially impossible to find, the t
 
 
 \subsection{Partial computations}
+\label{sec:partial-pebbling}
 
 The multi-processor red-blue pebbling or MBSP models above already capture most of the key factors of scheduling a computation. However, there are of course many further aspects that could be incorporated into the model to make it even more realistic. Here we briefly discuss one of these extensions: partial computations.
 
@@ -407,11 +408,27 @@ and these bounds are realisable by practical algorithms~\cite{rutledge51,rutledg
 
 \subsubsection*{Generalisability}
 
-This is a much harder problem, solvable to optimality for severely small problems in the general case
-\begin{itemize}
-	\item (point forward to Section on OneStopParallel)
-\end{itemize}
-Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
+Lower bounds for I/O have been found for a variety of algorithms--
+canonical ones discovered in the past century~\cite{HongKung,aggarwal88,toledo99,irony04},
+but also for recent algorithms such as the transformative FlashAttention~\cite{Saha}.
+Similar to established approaches for minimising communication,
+these methods are tried and tested,
+and often lead to optimal sequential algorithms.
+
+The classic red-blue pebble game does not account for partial computations:
+materialising a single output through accumulating $k$ inputs often does not require that all inputs reside in fast memory--
+accumulation could proceed using $r<k$ memory by, e.g., blocking and tiling.
+Extending the game to account for partial computations generalises the classic approach,
+and was first explored by Sobczyk~\cite{sobczyk2026complexity}.
+We extended the classic $S$-partition concept from Hong and Kung to one able to prove lower bounds in this partial pebbling game~\cite{partial_opdas},
+which again leads to lower bounds attainable by practical algorithms such as for the FFT, matrix--matrix multiplication, and FlashAttention~\cite{partial_opdas}--
+recall also Section~\ref{sec:partial-pebbling}.
+
+Although this approach too hence is generalisable across computations and refined models,
+individual results are specific to problems and require human expertise to establish.
+More crucially for practice, lower bounds on I/O typically are not sufficient in modern use cases:
+contemporary systems are parallel and must be driven by parallel algorithms,
+and therefore horizontal communication must be considered.
 
 \subsection{NUMA}
 
@@ -434,6 +451,12 @@ arbitrary factors away from optimal applies when a scheduler has no knowledge ab
 Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
 
 Mention Valiant's theorems
+
+This is a much harder problem, solvable to optimality for severely small problems in the general case
+\begin{itemize}
+	\item (point forward to Section on OneStopParallel)
+\end{itemize}
+Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
 
 \subsection{Parallel frameworks and run-time systems}
 
