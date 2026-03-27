@@ -8,10 +8,18 @@ paper.pdf: pdf-illustrations paper.bbl paper.aux #paper.toc
 	pdflatex paper
 
 pdf/%.pdf: eps/%.eps
-	mkdir pdf || true
+	mkdir -p pdf
 	epstopdf "$<" "--outfile=$@"
 
-pdf-illustrations: pdf/fft-8.pdf pdf/fft-n8-p2.pdf pdf/gemm-n4.pdf pdf/gemm-n4-p8.pdf pdf/gemm-n4-p4.pdf
+pdf-illustrations: eps-to-pdf dot-to-pdf
+
+pdf/%.pdf: dot/%.dot
+	mkdir -p pdf
+	dot -Tpdf "$<" "-o" "$@"
+
+eps-to-pdf: pdf/fft-8.pdf pdf/fft-n8-p2.pdf pdf/gemm-n4.pdf pdf/gemm-n4-p8.pdf pdf/gemm-n4-p4.pdf
+
+dot-to-pdf: pdf/SpTrSV-dependency.pdf
 
 paper.bbl: paper.aux paper.bib
 	bibtex paper

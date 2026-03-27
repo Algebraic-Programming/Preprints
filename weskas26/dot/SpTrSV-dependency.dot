@@ -1,0 +1,24 @@
+digraph finite_state_machine {
+	fontname="Computer Modern Roman"
+	node [fontname="Computer Modern Roman"]
+	edge [fontname="Computer Modern Roman"]
+	rankdir=LR;
+	node [shape = circle];
+    0 [label = <<I>A</I><SUB>1,1</SUB>>];
+    1 [label = <<I>A</I><SUB>2,2</SUB>>];
+    2 [label = <<I>A</I><SUB>3,1</SUB>>];
+    3 [label = <<I>A</I><SUB>3,3</SUB>>];
+    4 [label = <<I>A</I><SUB>4,2</SUB>>];
+    5 [label = <<I>A</I><SUB>4,4</SUB>>];
+	6 [label = <<I>A</I><SUB>5,2</SUB>>];
+    7 [label = <<I>A</I><SUB>5,3</SUB>>];
+    8 [label = <<I>A</I><SUB>5,5</SUB>>];
+    0 -> 2;
+    1 -> 4;
+    1 -> 6;
+    2 -> 3;
+    3 -> 7;
+    4 -> 5;
+    6 -> 8;
+    7 -> 8;
+}
