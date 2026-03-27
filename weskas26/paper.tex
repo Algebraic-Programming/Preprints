@@ -626,12 +626,12 @@ where we omitted the zero entries. The standard algorithm to solve the linear eq
 	}
 \end{algorithm}
 
-We see that each non-zero entry $A_{i,j}$ of $\vect{A}$ corresponds to an operation in the algorithm. Specifically, if $i<j$ the entry $A_{i,j}$ corresponds to Line~\ref{alg-line:forward-sub-acc} and if $i = j$ it corresponds to Line~\ref{alg-line:forward-sub-div}. Implicitly, there are a lot of dependencies in the algorithm. To execute Line~\ref{alg-line:forward-sub-acc} with $A_{i,j}$ we need to know the value of $x_j$ which corresponds to the entry $A_{j,j}$. Likewise, to produce the value $x_i$ corresponding to the entry $A_{i,i}$, we need to have done the accumulation in Line~\ref{alg-line:forward-sub-acc}. Hence, it depends on the computations corresponding to the entries $A_{i,j} \neq 0$ with $j < i$.
+We see that each non-zero entry $A_{i,j}$ of $\vect{A}$ corresponds to an operation in the algorithm. Specifically, if $i<j$ the entry $A_{i,j}$ corresponds to Line~\ref{alg-line:forward-sub-acc} and if $i = j$ it corresponds to Line~\ref{alg-line:forward-sub-div}. Implicitly, there are a lot of dependencies in the algorithm. To execute Line~\ref{alg-line:forward-sub-acc} with $A_{i,j}$ we need to know the value of $x_j$ which corresponds to the entry $A_{j,j}$. Likewise, to produce the value $x_i$ corresponding to the entry $A_{i,i}$, we need to have done the accumulation in Line~\ref{alg-line:forward-sub-acc}. Hence, it depends on the computations corresponding to the entries $A_{i,j} \neq 0$ with $j < i$. For the matrix $\vect{A}$ in Equation~\ref{eq:sparse-lower-triangular-matrix-example}, these dependencies are illustrated in Figure~\ref{fig:SpTrSV-dependency}.
 
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.5\linewidth]{pdf/SpTrSV-dependency.pdf}
-	\caption{\label{fig:SpTrSV-dependency} Dependencies in the forward-substitution algorithm of the matrix $\vect{A}$ in Equation~\ref{eq:sparse-lower-triangular-matrix-example}.}
+	\caption{\label{fig:SpTrSV-dependency} Dependencies in the forward-substitution algorithm, Algorithm~\ref{alg:forward-substitution}, of the matrix $\vect{A}$ in Equation~\ref{eq:sparse-lower-triangular-matrix-example}.}
 \end{figure}
 
 If one wants to parallelise this algorithm, one has little choice to study the dependencies. At the Huawei Von Neumann Research Center in Zurich, we have developed algorithms to do precisely that. The algorithm \todo{should one name it?}, available in OneStopParallel \cite{OneStopParallel}, clusters operations in a manner that preserves locality, maximises independent compute all the whilst keeping significant parallelism.
