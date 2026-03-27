@@ -26,6 +26,28 @@
 % For checking overfull boxes -- Comment in final version
 \overfullrule=5pt
 
+% Algorithm package
+\usepackage[linesnumbered, ruled, vlined, algosection]{algorithm2e}
+\SetKwInput{KwComplexity}{Complexity}
+\SetKwInput{KwRuleI}{Rule~I}
+\SetKw{RuleI}{Rule~I}
+\SetKwInput{KwRuleII}{Rule~II}
+\SetKw{RuleII}{Rule~II}
+\SetKw{RuleIandII}{Rules~I\,\&\,II}
+\SetKw{Continue}{continue}
+\SetKw{Break}{break}
+\SetKw{False}{false}
+\SetKw{True}{true}
+\SetKw{And}{and}
+\SetKw{Or}{or}
+\SetKw{Delete}{delete}
+\SetKw{Not}{not}
+\SetKw{Then}{then}
+
+% Custom commands
+% RS:
+\newcommand{\vect}[1]{{\boldsymbol{#1}}}
+
 \newcommand{\todo}[1]{{\color{red} \sf TODO: [#1]}}
 \newcommand{\rs}[1]{{\color{violet} \sf RS: [#1]}} 
 \newcommand{\tb}[1]{{\color{teal} \sf TB: [#1]}}
@@ -524,21 +546,85 @@ TODO mention partitioning, pebbling algorithms? Spectral stuff? Ubuntu /Spack pa
 \section{Results}
 
  Summarise key results from the various publications and applications
- \begin{itemize}
-	 \item EDA / SpTrsv
-	 \item MoE
-	 \item algorithm-specific parallelisation should be pointed out? (FFT, GEMM, Attention?, etc.)
- \end{itemize}
+\begin{itemize}
+	\item EDA / SpTrsv
+	\item MoE
+	\item algorithm-specific parallelisation should be pointed out? (FFT, GEMM, Attention?, etc.)
+\end{itemize}
 
-\begin{figure}
-	\centering
-	\resizebox{.42\textwidth}{!}{\input{tikz/sptrsv.tikz}}
-	\caption{
-		Here's an old SpTRSV illustration, if needed. Old caption in comments.
-		%Example for a sparse triangular linear system: we need to solve the equation $A \cdot x = b$ for the vector $x$, with $A$ being a sparse lower triangular matrix (left side) and $b$ being a dense vector (right side). The forward substitution algorithm for the problem allows for a simple and natural DAG representation, and hence our scheduling algorithms can be easily applied to parallelize the computation.
+
+\subsection{Sparse Triangular Solve}
+	In a wide range of applications from structural and electromagnetic simulations, found in engineering to electronic design automation, to Artificial Intelligence, one is often faced with the problem of finding $\vect{x}$ satisfying a linear equation
+	\begin{equation} \label{eq:linear-eq}
+		\vect{A}\vect{x} = \vect{b}\,.
+	\end{equation}
+	The golden rule when faced with such a problem is:
+
+\begin{quote}
+\begin{center}
+	``Don't invert that matrix.'' --- \emph{John D.\@ Cook}.
+\end{center}
+\end{quote}
+
+Instead, one employs what is called a \emph{solve} operation which only computes the vector $\vect{x}$ which is only a fraction of the information contained in the inverse $\vect{A}^{-1}$. Even with this optimisation, such a solve is often the bottleneck of a simulation. There are several reasons for this
+\begin{enumerate}
+	\item numerical stability,
+	\item many fine dependencies, and
+	\item short operations.
+\end{enumerate}
+To illustrate, we consider the special case where $\vect{A}$ is lower triangular we furthermore assume that $\vect{A}$ is sparse. Albeit it being a special case, very often the general case can be reduced to this case. Here is an example of such a matrix
+\begin{equation} \label{eq:sparse-lower-triangular-matrix-example}
+	\vect{A} = 
+	\begin{pmatrix}
+	A_{1,1} & A_{1,2} & A_{1,3} & A_{1,4} & A_{1,5} \\
+	A_{2,1} & A_{2,2} & A_{2,3} & A_{2,4} & A_{2,5} \\
+	A_{3,1} & A_{3,2} & A_{3,3} & A_{3,4} & A_{3,5} \\
+	A_{4,1} & A_{4,2} & A_{4,3} & A_{4,4} & A_{4,5} \\
+	A_{5,1} & A_{5,2} & A_{5,3} & A_{5,4} & A_{5,5}	
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		1.34 & & & & \\
+		& 0.38 & & & \\
+		-0.86 & & 7.01 & & \\
+		& -0.26 & & -0.63 & \\
+		& 3.75 & -7.33 & & 1.21  
+	\end{pmatrix} \,,
+\end{equation}
+where we omitted the zero entries. The standard algorithm to solve the linear equation, Eq.~\eqref{eq:linear-eq}, is the forward-substitution algorithm, see Algorithm~\ref{alg:forward-substitution}.
+
+\begin{algorithm}[htbp]
+	\DontPrintSemicolon
+	\SetNlSty{textsc}{}{}
+	\SetAlgoNlRelativeSize{-1}
+	\caption{\label{alg:forward-substitution}Forward-substitution algorithm}
+	\KwData{An invertible lower-triangular matrix $\vect{A}\in \mathbb{R}^{n \times n}$ and a vector $\vect{b} \in \mathbb{R}^{n}$.}
+	\KwResult{A vector $\vect{x}\in \mathbb{R}^{n}$ such that $\vect{A}\vect{x}=\vect{b}$.}
+	\BlankLine
+	\For{$i = 1, \dots, n$\label{alg-line:forward-sub-outer-loop}}{
+		$t \gets b_i$\;
+		\For{\emph{$j = 1, \dots, i-1$ with $A_{i,j}\neq 0$}}{
+			$t \gets t - A_{i,j}x_j$\label{alg-line:forward-sub-acc}\;
+		}
+		$x_i \gets t / A_{i,i}$\label{alg-line:forward-sub-div}\;
 	}
-	\label{fig:sptrsv}
-\end{figure}
+\end{algorithm}
+
+We see that each non-zero entry $A_{i,j}$ of $\vect{A}$ corresponds to an operation in the algorithm. Specifically, if $i<j$ the entry $A_{i,j}$ corresponds to Line~\ref{alg-line:forward-sub-acc} and if $i = j$ it corresponds to Line~\ref{alg-line:forward-sub-div}. Implicitly, there are a lot of dependencies in the algorithm. To execute Line~\ref{alg-line:forward-sub-acc} with $A_{i,j}$ we need to know the value of $x_j$ which corresponds to the entry $A_{j,j}$. Likewise, to produce the value $x_i$ corresponding to the entry $A_{i,i}$, we need to have done the accumulation in Line~\ref{alg-line:forward-sub-acc}. Hence, it depends on the computations corresponding to the entries $A_{i,j} \neq 0$ with $j < i$.
+
+
+
+
+
+%\begin{figure}
+%	\centering
+%	\resizebox{.42\textwidth}{!}{\input{tikz/sptrsv.tikz}}
+%	\caption{
+%		Here's an old SpTRSV illustration, if needed. Old caption in comments.
+%		%Example for a sparse triangular linear system: we need to solve the equation $A \cdot x = b$ for the vector $x$, with $A$ being a sparse lower triangular matrix (left side) and $b$ being a dense vector (right side). The forward substitution algorithm for the problem allows for a simple and natural DAG representation, and hence our scheduling algorithms can be easily applied to parallelize the computation.
+%	}
+%	\label{fig:sptrsv}
+%\end{figure}
 
 
 \section{Conclusion}
