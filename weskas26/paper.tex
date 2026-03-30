@@ -658,9 +658,16 @@ We see that each non-zero entry $A_{i,j}$ of $\vect{A}$ corresponds to an operat
 	\caption{\label{fig:SpTrSV-dependency} Dependencies in the forward-substitution algorithm, Algorithm~\ref{alg:forward-substitution}, of the matrix $\vect{A}$ in Equation~\ref{eq:sparse-lower-triangular-matrix-example}.}
 \end{figure}
 
-If one wants to parallelise this algorithm, one has little choice to study the dependencies. At the Huawei Von Neumann Research Center in Zurich, we have developed algorithms to do precisely that. The algorithm \todo{should one name it?}, available in OneStopParallel \cite{OneStopParallel}, clusters operations in a manner that preserves locality, maximises independent compute all the whilst keeping significant parallelism.
+If one wants to parallelise this algorithm, one has little choice to study the dependencies. At the Huawei Von Neumann Research Center in Zurich, we have developed algorithms to do precisely that. The algorithms \emph{GrowLocal} and \emph{GrowLocal SSP}, available in OneStopParallel \cite{OneStopParallel}, clusters operations in a manner that preserves locality, maximises independent compute all the whilst keeping significant parallelism. In Figure~\ref{fig:sptrsv-scaling}, we show the geometric mean speed-up including interquartile ranges of our scheduling algorithms \emph{GrowLocal} and \emph{GrowLocal SSP} and compare them against the state-of-the-art schedulers HDagg (synchronous scheduler)~\cite{zarebavani2022hdagg} and SpMP (asynchronous scheduler)~\cite{park2014sparsifying}. The benchmarks are over various CPU architecture, including a Huawei Kunpeng, and three data sets derived from the SuiteSparse Matrix Collection~\cite{davis2011university}. The first data set, Suite Sparse, represents a hard to parallelise data set and the other two represent typical matrices one would find in applications.
 
-\todo{result general bench marks}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.9\linewidth]{pdf/SpeedUpGeomeanIQR.pdf}
+	\caption{\label{fig:sptrsv-scaling} Scaling plots depicting the geometric mean speed-up over Serial and interquartile range of each algorithm on a given data set, architecture, and core count.}
+\end{figure}
+
+
 
 \todo{EDA results}
 
