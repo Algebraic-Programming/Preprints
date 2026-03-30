@@ -525,13 +525,19 @@ gets worse with more NUMA levels (recap SPAA results)
 
 \subsection{Parallel frameworks and run-time systems}
 
-novel approaches that automate usage of the above insights, e.g., ALP
-
 A section on general advice for parallel frameworks and run-time systems
 
-arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
+Run-time systems:
 \begin{itemize}
+	\item arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
 	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
+	\item pattern-specific scheduling (pattern machines). Pipelines may be specifically useful, e.g., for serving. Recall parametrisation (cite work with Aris)
+\end{itemize}
+
+Frameworks:
+\begin{itemize}
+	\item novel approaches that automate usage of the above insights, e.g., ALP
+	\item apply them for AI (e.g., are most AI ops still tensor contractions? Cite Intel work.)
 \end{itemize}
 
 
