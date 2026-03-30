@@ -174,42 +174,55 @@ However, we also emphasize that in general, partial computations can enable sign
 
 \section{Avoiding hardness}
 
-While general scheduling while taking into account realistic costs is hard as outlined in the preceding section,
-scheduling in practice works around hardness in a variety of ways.
-We index common approaches along the following practical use cases:
+Scheduling while taking into account realistic costs hence is hard,
+and we proved finding polynomial-time algorithms that approach optimal solutions to some useful factor is impossible--
+yet practice does regularly realise software that achieves near-optimal performance on parallel architectures and systems.
+
+This is possible by working around hardness,
+principally by \emph{not} consider scheduling as a general problem--
+and instead to focus on scheduling specific (classes of) computations.
+This section introduces common approaches along the different types of data movement:
 \begin{enumerate}
-	\item minimise horizontal data movement (communication);
-	\item minimise vertical data movement (I/O); and
-	\item minimise data movement through NUMA hierarchies.
+	\item horizontal data movement (communication);
+	\item vertical data movement (I/O); and
+	\item data movement through NUMA hierarchies.
 \end{enumerate}
-We focus on proven techniques by which the high-performance computing (HPC) community has operated in the last few decades,
-which principially considers proving optimality for specific problems or specific classes of problems,
-and discovering parallel algorithms that achieve these bounds.
+We focus on techniques %by which the high-performance computing (HPC) community has operated in the last few decades,
+%which principially considers proving 
+that prove optimality for specific problems or specific classes of problems.
+Finding such bounds allows discovering algorithms that achieve them.
 %Such problem-specific approaches have reliably led to algorithms and software that indeed achieve optimal performance in practice.
-This approach stands in stark contrast to finding solutions that work in the most generic cases.
-We couple outlining these state-of-the-art methodologies with novel insights from our research,
-and discuss practical implications to parallel frameworks for AI and beyond,
-run-time system design for modern large-scale compute infrastructures,
-and insights tailored to the complex case of irregular computations.
+%This approach stands in stark contrast to finding solutions that work in the most generic cases.
+We couple outlining these state-of-the-art methodologies with novel insights from our research: we discuss
+recursive and hierarchical approaches for dealing with NUMA,
+implications on run-time system design for modern large-scale computing systems,
+implications on parallel frameworks for AI and beyond, and
+the case of irregular computations.
 
 \subsection{Horizontal data movement}
 \label{sec:avoiding-communication}
 
 Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation.
 One such model, the Bulk Synchronous Parallel (BSP) model, %developed during the late 80s,
-comes with two modes of operation, one automatic and one manual~\cite{valiant90}. %:
+%comes with two modes of operation, one automatic and one manual~\cite{valiant90}. %:
 %one automatic, where programs are expressed sequentially and through hashing of program data, executable in parallel in a fully scalable fashion; and
 %one manual, where programs explicitly coordinate computation and communication%, and potentially differ at different processes
 %~\cite{valiant90}.
-In both cases, the cost model revolves not only around work,
-but also around supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models} for details.
-Costs are typically parametrised in the number of processors $p$ and some problem-specific parameter $n$, such as a problem size.
+%In both cases, the cost model revolves not only around work,
+%but also 
+revolves around supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models}.
+Costs are parametrised in the number of processors $p$ and some problem-specific parameter $n$, such as a problem size.
 %To recall, the related system parameters are $g$, the cost of sending one word, and $l$, the cost of moving from one superstep to the next-- principially, making sure that any necessary communications are completed before continuing, and $p$, the number of processing units in the parallel system.
 %Compute costs are hence expressed in terms of $g$ and $l$, while parameterised in $p$ and some problem size $n$.
 %AJ: check later if we do indeed need to recall more of these definitions
-The key phrase here is \emph{problem-specific}: in HPC, by far most known algorithms are manual-mode BSP, and literature is rich with examples of optimal algorithms or algorithms that operate within an optimal trade-off regime.
+The key phrase here is \emph{problem-specific}:
+in HPC, by far most known algorithms are %manual-mode 
+BSP, and
+literature is rich with examples of optimal algorithms or algorithms that operate within an optimal trade-off regime.
 %By contrast, most highly scalable big-data frameworks instead operate by automatic-mode BSP, and achieve an \emph{expected} cost of $\mathcal{O}(n/p)$, where $n$ here could be taken as proportional to the number of data accesses the sequential program requires.
-We give two examples, fast Fourier transformation (FFT) and matrix multiplication, and demonstrate how optimal algorithms and optimal trade-offs may be derived.
+We give two such examples,
+fast Fourier transformation (FFT) and matrix multiplication, and
+demonstrate how optimal algorithms and optimal trade-offs may be derived.
 
 \subsubsection*{Fast Fourier transforms and butterfly DAGs}
 
