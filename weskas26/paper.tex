@@ -41,7 +41,7 @@
 \newcommand{\ajy}[1]{{\color{orange} \sf AJY: [#1]}}
 
 \title{What everyone should know about scheduling computations}
-\author{Papp, P. A. \and Yzelman, A. N. \and Steiner, R. S. \and ...}
+\author{Papp, P. A. \and Yzelman, A. N. \and Steiner, R. S. \and B\"{o}hnlein, T.}
 \date{\today}
 
 \begin{document}
@@ -356,7 +356,7 @@ and required concepts from category theory to formulate~\cite{koopman25}.
 
 \subsection{Vertical data movement}
 
-Vertical data movement concerns moving data from slow to fast memory,
+Vertical data movement concerns data movement from slow to fast memory,
 assuming computations only execute on the latter fast memory,
 and is otherwise known as I/O.
 Here, too, we may determine lower bounds and find algorithms that achieve them.
@@ -401,15 +401,15 @@ these methods are tried and tested,
 and often lead to optimal sequential algorithms.
 
 The classic red-blue pebble game does not account for partial computations:
-materialising a single output through accumulating $k$ inputs often does not require that all inputs reside in fast memory--
-accumulation could proceed using $r<k$ memory by, e.g., blocking and tiling.
+materialising a single output through accumulating $k$ inputs often does not require that all inputs reside in fast memory before the computation can commence--
+accumulation could, for example, proceed using $r<k$ memory by using well-known blocking and tiling techniques.
 Extending the game to account for partial computations generalises the classic approach,
 and was first explored by Sobczyk~\cite{sobczyk2026complexity}.
 We extended the classic $S$-partition concept from Hong and Kung to one able to prove lower bounds in this partial pebbling game~\cite{partial_opdas},
 which again leads to lower bounds attainable by practical algorithms such as for the FFT, matrix--matrix multiplication, and FlashAttention~\cite{partial_opdas}--
 recall also Section~\ref{sec:partial-pebbling}.
 
-Although this approach too hence is generalisable across computations and refined models,
+Although this approach hence too is generalisable across computations and refined models,
 individual results are specific to problems and require human expertise to establish.
 More crucially for practice, lower bounds on I/O typically are not sufficient in modern use cases:
 contemporary systems are parallel and must be driven by parallel algorithms,
@@ -417,33 +417,56 @@ and therefore horizontal communication must be considered.
 
 \subsection{NUMA}
 
+\begin{figure}
+	\centering
+	\resizebox{.4\textwidth}{!}{\input{tikz/numa.tikz}}
+	\caption{A non-uniform memory access architecture, corresponding to, for example, two single-socket systems connected through a network.}
+	\label{fig:numa}
+\end{figure}
+
+Combining horizontal with vertical data movement results in multi-processor pebbling (MPP),
+a recent pebbling game extension proposed by us~\cite{MPP_opdas}.
+This generalisation results in yet another hard and practically-inapproximable problem,
+even without modeling an arbitrarily deep NUMA hierarchy as found in contemporary CPUs, accelerators, and system interconnects.
+Figure~\ref{fig:numa} pictures a NUMA structure.
+Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
+modeling memory limitations at each level~\cite{valiant11}.
+Multi-BSP with depth $d=2$ and zero latency results in the same model as MPP.
+
+While for BSP,
+finding optimal schedules for reasonably-sized DAGs is possible when commercial ILP solvers are available (see Section~\ref{sec:onestopparallel}),
+doing the same for MPP is already restricted to DAGs with tens of nodes only,
+when given a solver budget of several hours.
+This is unlikely to lead to satisfactory practical results,
+especially for $d>2$ and/or when incorporating latency costs,
+without spending well beyond a few hours of ILP solver time.
+
+Recursive and hierarchical approaches may reduce the practical complexities of dealing with $d>1$--
+but do not do so effectively in general,
+and should not be applied without thorough consideration.
+Another solution again resides with considering specific DAG structures only.
+We discuss both in turn.
+
+\subsubsection*{Recursive and hierarchical scheduling}
+
+Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
+
 be careful with multi-level (distributed) scheduling
 
 gets worse with more NUMA levels (recap SPAA results)
 
-\begin{figure}
-	\centering
-	\resizebox{.4\textwidth}{!}{\input{tikz/numa.tikz}}
-	\caption{Here's a NUMA picture if needed.}
-	\label{fig:numa}
-\end{figure}
+\subsubsection*{Specific DAG structures}
+
+Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
+
+Mention Valiant's theorems
 
 arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
 \begin{itemize}
 	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
 \end{itemize}
 
-Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
-
-Mention Valiant's theorems
-
-This is a much harder problem, solvable to optimality for severely small problems in the general case
-\begin{itemize}
-	\item (point forward to Section on OneStopParallel)
-\end{itemize}
-Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
-
-\subsection{Parallel frameworks and run-time systems}
+\subsection{Parallel frameworks}
 
 novel approaches that automate usage of the above insights, e.g., ALP
 
@@ -474,6 +497,7 @@ imply the same work-arounds.
 
 
 \section{OneStopParallel}
+\label{sec:onestopparallel}
 
 Describe what OSP contains and aims to provide/support
 
