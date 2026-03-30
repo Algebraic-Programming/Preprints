@@ -193,6 +193,7 @@ run-time system design for modern large-scale compute infrastructures,
 and insights tailored to the complex case of irregular computations.
 
 \subsection{Horizontal data movement}
+\label{sec:avoiding-communication}
 
 Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation.
 One such model, the Bulk Synchronous Parallel (BSP) model, %developed during the late 80s,
@@ -411,6 +412,10 @@ recall also Section~\ref{sec:partial-pebbling}.
 
 Although this approach hence too is generalisable across computations and refined models,
 individual results are specific to problems and require human expertise to establish.
+Jain and Zaharia suggest spectral partitioning methods to methodologically derive lower bounds on I/O costs~\cite{jain20},
+potentially simplifying this effort--
+however, these bounds are not strict and may not find practically useful bounds always.
+\ajy{To Andras or Toni: do we show this in one of our papers actually? (If yes, should cite it here.)}
 More crucially for practice, lower bounds on I/O typically are not sufficient in modern use cases:
 contemporary systems are parallel and must be driven by parallel algorithms,
 and therefore horizontal communication must be considered.
@@ -426,51 +431,96 @@ and therefore horizontal communication must be considered.
 
 Combining horizontal with vertical data movement results in multi-processor pebbling (MPP),
 a recent pebbling game extension proposed by us~\cite{MPP_opdas}.
-This generalisation results in yet another hard and practically-inapproximable problem,
+This generalisation results in yet another hard and practically inapproximable problem,
 even without modeling an arbitrarily deep NUMA hierarchy as found in contemporary CPUs, accelerators, and system interconnects.
 Figure~\ref{fig:numa} pictures such a NUMA structure.
 Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
 modeling memory limitations at each level~\cite{valiant11}.
 Multi-BSP with depth $d=2$ and zero latency results in the same model as MPP.
 
-While for BSP,
-finding optimal schedules for reasonably-sized DAGs is possible when commercial ILP solvers are available (see Section~\ref{sec:onestopparallel}),
-doing the same for MPP is already restricted to DAGs with tens of nodes only,
-even when given the solver a several-hour budget.
+While for BSP finding optimal schedules for reasonably-sized DAGs is possible %when commercial ILP solvers are available 
+(see Section~\ref{sec:onestopparallel}),
+doing the same for MPP is restricted to DAGs with tens of nodes only--
+and require in the order of several hours of compute time.
+%with ILP solvers given a several-hour budget.
 This is unlikely to lead to satisfactory practical results,
 especially for $d>2$ or when incorporating latency costs,
-even if allotting days to solvers.
+even when allotting days of scheduling compute time. %instead of hours.
+Recursive and hierarchical approaches may reduce the computational complexities of dealing with $d>1$--
+%but are not effective in general,
+%and should not be applied without thorough consideration.
+Section~\ref{sec:avoiding-numa} details those.
+A more fundamental solution prevents computationally expensive searches for optimised schedules across NUMA hierarchies by,
+again, considering specific DAG structures.
+%These may be analysed to find lower bounds on combined horizontal and vertical data movement,
+%accounting for both latency and throughput costs.
+Proving problem-specific lower bounds, however, can be a tedious process
+--even more so in a model that combines BSP and an hierarchical I/O model~\cite{valiant90,savage95}--
+%which is what Multi-BSP and MPP require.
+that must be followed with equally-tedious manual algorithm design,
+a process that must be repeated for every workload of interest.
 
-Recursive and hierarchical approaches may reduce the practical complexities of dealing with $d>1$--
-but do not do so effectively in general,
-and should not be applied without thorough consideration.
-Another solution again resides with considering specific DAG structures only.
-We discuss both in turn.
+For Multi-BSP, Valiant proposes to relax the notion of optimality to be within a factor $d$, and
+provides a mathematical tool that simplifies determining lower bounds for arbitrary hierarchies.
+This tool applies for any so-called \emph{$w(S)$-limited straight-line programs}:
+programs for which any subset of operations that takes at most $S$ inputs and produces at most $S$ outputs contains no more than $w(S)$ work.
+Several classic algorithms fall under this definition,
+for which he demonstrates that applying the tool yields useful lower bounds for matrix--matrix multiplication, fast Fourier transform, and sorting~\cite{valiant11}.
+The tool also applies to MPP (Multi-BSP with $d=2$) and
+to horizontal communication ($d=1$, i.e., BSP).%, as treated in Section~\ref{sec:avoiding-communication}).
 
-\subsubsection*{Recursive and hierarchical scheduling}
+\subsection{Recursive and hierarchical approaches}
+\label{sec:avoiding-numa}
 
-Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
+%Tools for general problem exist: recall Jain \& Zaharia, point out weaknesses and differences, point again to OSP for heuristics that work on multi-processor pebbling
+% AJ: I get where this is coming from, but I didn't do it as it seems to distract from the main points in every (sub)subsection -- instead, J&Z are now mentioned in the vertical data movement section, while the way this remark was intended probably best goes to the OSP section
+
+One idea decomposes the problem along a NUMA hierarchy,
+dividing the problem into sub-problems that each deal with the simpler uniform problem only.
+Assume there are $p=\Pi_ip_i$ processors in total,
+and $p_i$ processors or sub-machines at each of the $d$ levels of the NUMA hierarchy.
+Several possibilities recursion or exploiting hierarchies exist:
+\begin{enumerate}
+	\item treat each level individually, starting at the top ($p_{0}$), and applying recursion to each so-identified sub-problem ($p_{>0}$);
+	\item schedule across $p$ processors while ignoring hierarchies, then assign sub-schedules in a hierarchy-aware fashion;
+	\item coarsen the problem DAG for the top-level problem, then uncoarsen when considering lower-level problems. 
+\end{enumerate}
+It is also possible to decompose different cost factors from the models and formulate solutions that optimise those in sequence:
+\begin{enumerate}
+	\setcounter{enumi}{3}
+	\item find a good separation of the problem DAG in terms of work (e.g., minimise load balance), and then find an optimised (hierarchical) communication schedule;
+	\item split the problem DAG into serial phases (minimise $l$), parallelise each phase separately, then glue the sub-schedules together;
+	\item first minimise horizontal communication, and then given each processor-local DAG minimise vertical data movement.
+\end{enumerate}	
+The difference between the first and third approach is that the former does not consider the complete problem on the lower-level problems (recursion),
+while the latter does consider the full computational DAG while refining the solution across a NUMA hierarchy (multi-level).
+The fourth and fifth approaches only have one of its solution steps take a hierarchical system model into account.
+The sixth approach could have both its steps take the NUMA hierarchy into account, however, in a separated fashion--
+the first step accounts for shared resources (networks or shared caches) while the second step deals with private processor-local memory hierarchies. %,
+%akin to finding a good multi-level pebbling~\cite{savage95}.
+
+A myriad of algorithms may be envisioned within each category;
+Section~\ref{sec:onestopparallel} details specific approaches of practical value in the third and sixth categores. 
+%This section instead follows with some general results--
+%and resulting insights on designs that should be avoided.
+We first follow with some general results.
+First, 
 
 be careful with multi-level (distributed) scheduling
 
 gets worse with more NUMA levels (recap SPAA results)
 
-\subsubsection*{Specific DAG structures}
+\subsection{Parallel frameworks and run-time systems}
 
-Similar implications therefore apply here: limit to specific problems to find lower bounds, then find algorithms that attain them (e.g., GEMV)
+novel approaches that automate usage of the above insights, e.g., ALP
 
-Mention Valiant's theorems
+A section on general advice for parallel frameworks and run-time systems
 
 arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
 \begin{itemize}
 	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
 \end{itemize}
 
-\subsection{Parallel frameworks}
-
-novel approaches that automate usage of the above insights, e.g., ALP
-
-A section on general advice for parallel frameworks and run-time systems
 
 \subsection{Irregular computations}
 
