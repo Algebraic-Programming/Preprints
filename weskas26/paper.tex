@@ -428,7 +428,7 @@ Combining horizontal with vertical data movement results in multi-processor pebb
 a recent pebbling game extension proposed by us~\cite{MPP_opdas}.
 This generalisation results in yet another hard and practically-inapproximable problem,
 even without modeling an arbitrarily deep NUMA hierarchy as found in contemporary CPUs, accelerators, and system interconnects.
-Figure~\ref{fig:numa} pictures a NUMA structure.
+Figure~\ref{fig:numa} pictures such a NUMA structure.
 Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
 modeling memory limitations at each level~\cite{valiant11}.
 Multi-BSP with depth $d=2$ and zero latency results in the same model as MPP.
@@ -436,10 +436,10 @@ Multi-BSP with depth $d=2$ and zero latency results in the same model as MPP.
 While for BSP,
 finding optimal schedules for reasonably-sized DAGs is possible when commercial ILP solvers are available (see Section~\ref{sec:onestopparallel}),
 doing the same for MPP is already restricted to DAGs with tens of nodes only,
-when given a solver budget of several hours.
+even when given the solver a several-hour budget.
 This is unlikely to lead to satisfactory practical results,
-especially for $d>2$ and/or when incorporating latency costs,
-without spending well beyond a few hours of ILP solver time.
+especially for $d>2$ or when incorporating latency costs,
+even if allotting days to solvers.
 
 Recursive and hierarchical approaches may reduce the practical complexities of dealing with $d>1$--
 but do not do so effectively in general,
