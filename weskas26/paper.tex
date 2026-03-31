@@ -639,6 +639,12 @@ Besides having a wide range of schedulers, OSP also ensures that these scheduler
 
 Apart from the algorithms themselves, OSP also has a range of further features to support the study of scheduling problems. It incorporates a test suite to evaluate the algorithms, tools that allow to visualize the input DAGs or the developed schedules, and file readers/writers in several different formats to load the the input DAGs and save the output schedules.
 
+\subsection{Access through a web interface}
+
+Besides the command-line and programmatic interfaces, we also provide a lightweight web interface to OSP. The goal of this interface is not to replace the full toolbox, but to make the most common scheduling workflows directly accessible to users who want to experiment with OSP on their own DAGs without first integrating the library into a larger software stack. In particular, the interface allows users to upload a computational DAG together with a machine description, select one or more schedulers, run the corresponding OSP executable on the server, and compare the resulting schedules through key metrics such as total cost, work cost, communication cost, number of supersteps, and scheduling time.
+
+The web interface furthermore supports downloading the generated schedules, and can thus serve both as an entry point for new users and as a rapid experimentation environment when comparing scheduler behaviour on representative workloads. This is particularly useful in early-stage application studies, where one often wants to evaluate several scheduling strategies quickly before deciding whether a tighter integration of OSP into an application or runtime system is warranted.
+
 TODO add an image of a visualized schedule here?
 
 TODO mention partitioning, pebbling algorithms? Spectral stuff? Ubuntu /Spack package? 
@@ -775,7 +781,7 @@ Given the success of our scheduler, we have applied it to the Huawei in-house ED
 
 For important kernels or classes of computation, nothing beats manual work (yet:)-- lower bounds, trade-off identifications, (poly-)algorithms that achieve them, combined with engineering efforts. Getting bounds though should not be skipped (engineers need to know what to aim for)
 
-Include also mention of OSP-as-a-Service, can deploy in application, or use for testing/exploration
+Beyond its role as a research toolbox, OneStopParallel is also meant to be directly usable in practice: users can integrate the underlying schedulers into applications and runtimes, or use the web interface as a lightweight \emph{OSP-as-a-Service} environment for testing and exploratory evaluation on concrete workloads.
 
 \subsection{Future directions}
 
@@ -787,4 +793,3 @@ Extensions to OSP -- mention collab with Dimos and the database
 \bibliography{paper}
 
 \end{document}
-
