@@ -736,9 +736,13 @@ If one wants to parallelise this algorithm, one has little choice to study the d
 	\caption{\label{fig:sptrsv-scaling} Scaling plots depicting the geometric mean speed-up over Serial and interquartile range of each algorithm on a given data set, architecture, and core count.}
 \end{figure}
 
+Given the success of our scheduler, we have applied it to the Huawei in-house EDA tooling. In Figure~\ref{fig:eda-sptrsv-scaling}, we show the speed-ups we get on EDA matrices on a Huawei Kunpeng.
 
-
-\todo{EDA results}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.6\linewidth]{pdf/EDASpeedUpGeomeanIQR.pdf}
+	\caption{\label{fig:eda-sptrsv-scaling} Scaling plots depicting the geometric mean speed-up over Serial and interquartile range of each algorithm on EDA matrices on an ARM Huawei Kunpeng machine.}
+\end{figure}
 
 
 
