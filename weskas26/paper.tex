@@ -121,6 +121,23 @@ a summary of where scheduling is applied at present
 \end{itemize}
 
 
+\section{Similar problems, similar results, and solutions}
+
+Partitioning,
+streaming,
+imply the same work-arounds.
+
+\begin{figure}
+	\centering
+	\resizebox{.3\textwidth}{!}{\input{tikz/hyper.tikz}}
+	\caption{
+		Here's an example hypergraph partitioning picture, if needed. Old description in comments.
+		%Illustration of a hypergraph with $9$ nodes and $4$ hyperedges. Consider the hyperedge $\{ v_1, v_2, v_3, v_4\}$ on the top. If we have a partitioning where e.g.\ $v_1$ and $v_4$ are assigned to processor $1$, $v_2$ to processor $2$, and $v_3$ to processor $3$, then we have $\lambda_h=3$ for this hyperedge, and hence its cost is $(\lambda_h-1)=2$. Indeed, if the data represented by the hyperedge is stored at processor $2$, for example, then it needs to be sent to two other processors (processors $1$ and $3$), so this hyperedge incurs $2$ communication steps under this partitioning.
+	}
+	\label{fig:hyper}
+\end{figure}
+
+
 \section{Scheduling is hard}
 
 It has been long known that scheduling is a particularly challenging problem. The complexity of problems is computer science is often defined via the concept of NP-hardness. Intuitively speaking, an NP-hard problem is one that is very unlikely to have an algorithm that can always find the optimal solution efficiently (i.e.\ with a running time that is polynomial in the size of the problem). In particular, if there was an efficient algorithm for any of the NP-hard problems, then all the other NP-hard problems could also be solved efficiently by reducing these problems to each other. There are thousands of problems that are known to be NP-hard, and many of these have been extensively studied by the community for decades; as such, when a problem is NP-hard, it is generally accepted that no polynomial-time algorithm exists for it.
@@ -546,23 +563,6 @@ Frameworks:
 note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
 
 Index good approaches for problems that are inherently irregular (and thus cannot, to significant degree, avoid hardness)
-
-
-\section{Similar problems, similar results, and solutions}
-
-Partitioning,
-streaming,
-imply the same work-arounds.
-
-\begin{figure}
-	\centering
-	\resizebox{.3\textwidth}{!}{\input{tikz/hyper.tikz}}
-	\caption{
-		Here's an example hypergraph partitioning picture, if needed. Old description in comments.
-		%Illustration of a hypergraph with $9$ nodes and $4$ hyperedges. Consider the hyperedge $\{ v_1, v_2, v_3, v_4\}$ on the top. If we have a partitioning where e.g.\ $v_1$ and $v_4$ are assigned to processor $1$, $v_2$ to processor $2$, and $v_3$ to processor $3$, then we have $\lambda_h=3$ for this hyperedge, and hence its cost is $(\lambda_h-1)=2$. Indeed, if the data represented by the hyperedge is stored at processor $2$, for example, then it needs to be sent to two other processors (processors $1$ and $3$), so this hyperedge incurs $2$ communication steps under this partitioning.
-	}
-	\label{fig:hyper}
-\end{figure}
 
 
 \section{OneStopParallel}
