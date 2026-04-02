@@ -205,6 +205,7 @@ However, we also emphasize that in general, partial computations can enable sign
 
 
 \section{Avoiding hardness}
+\label{sec:avoiding-hardness}
 
 Scheduling while taking into account realistic costs hence is hard,
 and we proved finding polynomial-time algorithms that approach optimal solutions to some useful factor is impossible--
@@ -514,6 +515,18 @@ for which he demonstrates that applying the tool yields useful lower bounds for 
 The tool also applies to MPP (Multi-BSP with $d=2$) and
 to horizontal communication ($d=1$, i.e., BSP).%, as treated in Section~\ref{sec:avoiding-communication}).
 
+\section{Implications on software design}
+\label{sec:software-implications}
+
+We next discuss implications on the software design beyond algorithm-specific techniques such as parametrisation and poly-algorithms. %,
+%discussed in the previous section.
+Careful software design allows the automatic application of similar techniques that successfully avoid hardness to various degrees.
+We first discuss recursive and hierarchical approaches and their limitations.
+Parallel frameworks and run-time systems allow for a natural layer in which some of the insights may be transparently applied,
+and are discussed second.
+Last,
+we discuss a class of computations that prevent avoiding hardness to significant degrees: irregular computations.
+
 \subsection{Recursive and hierarchical approaches}
 \label{sec:avoiding-numa}
 
@@ -524,33 +537,87 @@ One idea decomposes the problem along a NUMA hierarchy,
 dividing the problem into sub-problems that each deal with the simpler uniform problem only.
 Assume there are $p=\Pi_ip_i$ processors in total,
 and $p_i$ processors or sub-machines at each of the $d$ levels of the NUMA hierarchy.
-Several possibilities recursion or exploiting hierarchies exist:
+Several possibilities for recursion or exploiting hierarchies exist,
+broadly classified as follows:
 \begin{enumerate}
-	\item treat each level individually, starting at the top ($p_{0}$), and applying recursion to each so-identified sub-problem ($p_{>0}$);
-	\item schedule across $p$ processors while ignoring hierarchies, then assign sub-schedules in a hierarchy-aware fashion;
-	\item coarsen the problem DAG for the top-level problem, then uncoarsen when considering lower-level problems. 
+	\item treat each level individually,
+	starting at the top ($p_{0}$),
+	and applying recursion to each so-identified sub-problem ($p_{>0}$);
+	\item schedule across $p$ processors whilst ignoring hierarchies,
+	then assign the $p$ sub-schedules in a hierarchy-aware fashion;
+	\item coarsen the problem DAG for the top-level problem,
+	then progressively uncoarsen while iteratively considering the lower-level problems. 
 \end{enumerate}
-It is also possible to decompose different cost factors from the models and formulate solutions that optimise those in sequence:
+The difference between the first and third approach is that the former does not consider the complete problem on the lower-level problems
+(i.e., employing recursion),
+while the latter does consider the full computational DAG while refining the solution across a NUMA hierarchy
+(i.e., multi-level).
+
+It is also possible to decompose different cost factors from the (hierarchical) models,
+so to then formulate approaches that perform orthogonal optimisation of the separated cost factors.
+For example,
 \begin{enumerate}
 	\setcounter{enumi}{3}
-	\item find a good separation of the problem DAG in terms of work (e.g., minimise load balance), and then find an optimised (hierarchical) communication schedule;
-	\item split the problem DAG into serial phases (minimise $l$), parallelise each phase separately, then glue the sub-schedules together;
-	\item first minimise horizontal communication, and then given each processor-local DAG minimise vertical data movement.
+	\item first minimise horizontal communication (minimise processor-local work, $l$, and $g$),
+	and then given each processor-local DAG minimise vertical data movement;
+	\item split the problem DAG into serial phases (minimise $l$),
+	then parallelise each phase separately,
+	and finally glue the sub-schedules together;
+	\item find a good separation of the problem DAG in terms of work (e.g., minimise process-local work),
+	and then find an optimised (hierarchical) communication schedule.
 \end{enumerate}	
-The difference between the first and third approach is that the former does not consider the complete problem on the lower-level problems (recursion),
-while the latter does consider the full computational DAG while refining the solution across a NUMA hierarchy (multi-level).
-The fourth and fifth approaches only have one of its solution steps take a hierarchical system model into account.
-The sixth approach could have both its steps take the NUMA hierarchy into account, however, in a separated fashion--
+The fourth approach has both its steps take hierarchical costs into account--
+however, it separates different hierarchical factors:
 the first step accounts for shared resources (networks or shared caches) while the second step deals with private processor-local memory hierarchies. %,
 %akin to finding a good multi-level pebbling~\cite{savage95}.
+The fifth and sixth approaches only have one of its solution steps take a hierarchical system model into account.
 
 A myriad of algorithms may be envisioned within each category;
-Section~\ref{sec:onestopparallel} details specific approaches of practical value in the third and sixth categores. 
+Section~\ref{sec:onestopparallel} details specific approaches of practical value in the third and sixth categories. 
 %This section instead follows with some general results--
 %and resulting insights on designs that should be avoided.
-We first follow with some general results.
-First, 
+This section first follows with general results that warn against applying the other types of approaches in practice.
 
+\subsubsection*{1) Recursion}
+
+Consider partitioning as a sub-class of partitioning problems first,
+and consider a Multi-BSP (NUMA) hierarchy of depth $d=2$.
+We showed that even when assuming optimal oracles for the uniform partitioning problem ($d=1$),
+combining the optimal solutions in a recursive approach for $d>1$ results in solutions that are a factor $\Omega(n)$ away from optimal%
+\footnote{the big-Omega notation means \emph{at least proportional} to, in this case, the number of vertices in the DAG},
+where $n$ is the number of vertices in the computational DAG~\cite[Lemma 7.2]{hypergraphs_opdas}--
+i.e., the resulting distribution of the computation across the NUMA hierarchy can be arbitrarily bad. 
+This does not mean recursion is an inappropriate tool;
+%again,
+%as Section~\ref{sec:avoiding-hardness} discussed,
+applying recursion to problem-specific DAGs may yield immortal algorithms~\cite{mccoll99}--
+recall Section~\ref{sec:avoiding-hardness} for problem-specific approaches.
+However,
+%this result indicates that 
+for general-purpose software that exhibit computations with arbitrary structure,
+distributing the computations over a NUMA hierarchy should never involve recursion.
+
+\subsubsection*{2) Hierarchical assignment}
+
+Consider instead optimal uniform partitioning ($d=1$),
+followed by an optimal assignment of the parts through an arbitrary NUMA hierarchy ($d>1$).
+\emph{If} both steps can indeed by done optimally in practice,
+the result is a $g_0$-approximation algorithm--
+the resulting distribution is off-optimal by a multiplicative factor proportional to the top-level data movement cost.
+Worst-case examples that achieve this bound can be constructed~\cite[Theorem 7.4]{hypergraphs_opdas}.
+Hierarchical assignment hence is preferable over recursion in a worst-case analysis,
+however,
+the cost of ignoring hierarchy initially remains significant to the point that exploiting data locality lower in the hierarchy may be missed completely.
+
+\subsubsection*{4) Separating vertical from horizontal data movement}
+
+\subsubsection*{5) Communication scheduling}
+
+\subsubsection*{6) Superstep scheduling}
+
+\subsubsection*{Summary}
+
+In conclusion, ...
 be careful with multi-level (distributed) scheduling
 
 gets worse with more NUMA levels (recap SPAA results)
