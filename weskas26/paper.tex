@@ -154,6 +154,7 @@ imply the same work-arounds.
 
 
 \section{Scheduling is hard}
+\label{sec:scheduling-is-hard}
 
 It has been long known that scheduling is a particularly challenging problem. The complexity of problems is computer science is often defined via the concept of NP-hardness. Intuitively speaking, an NP-hard problem is one that is very unlikely to have an algorithm that can always find the optimal solution efficiently (i.e.\ with a running time that is polynomial in the size of the problem). In particular, if there was an efficient algorithm for any of the NP-hard problems, then all the other NP-hard problems could also be solved efficiently by reducing these problems to each other. There are thousands of problems that are known to be NP-hard, and many of these have been extensively studied by the community for decades; as such, when a problem is NP-hard, it is generally accepted that no polynomial-time algorithm exists for it.
 
@@ -572,55 +573,153 @@ the first step accounts for shared resources (networks or shared caches) while t
 %akin to finding a good multi-level pebbling~\cite{savage95}.
 The fifth and sixth approaches only have one of its solution steps take a hierarchical system model into account.
 
-A myriad of algorithms may be envisioned within each category;
-Section~\ref{sec:onestopparallel} details specific approaches of practical value in the third and sixth categories. 
+A myriad of algorithms may be envisioned within each category.
+Section~\ref{sec:onestopparallel} details heuristic approaches of practical value in categories $3$--$6$,
+while also presenting approaches for determining optimal schedules--
+including for hierarchical models. 
 %This section instead follows with some general results--
 %and resulting insights on designs that should be avoided.
-This section first follows with general results that warn against applying the other types of approaches in practice.
+This section first follows with general results that warn against applying the other types of approaches in practice,
+and summarises their model-based evaluations.
 
 \subsubsection*{1) Recursion}
 
 Consider partitioning as a sub-class of partitioning problems first,
 and consider a Multi-BSP (NUMA) hierarchy of depth $d=2$.
 We showed that even when assuming optimal oracles for the uniform partitioning problem ($d=1$),
-combining the optimal solutions in a recursive approach for $d>1$ results in solutions that are a factor $\Omega(n)$ away from optimal%
-\footnote{the big-Omega notation means \emph{at least proportional} to, in this case, the number of vertices in the DAG},
+combining the optimal solutions in a recursive approach for $d>1$ results in solutions that are up to $\Omega(n)$ away from optimal%
+\footnote{the big-Omega notation means \emph{at least} proportional to, in this case, the number of vertices in the DAG},
 where $n$ is the number of vertices in the computational DAG~\cite[Lemma 7.2]{hypergraphs_opdas}--
 i.e., the resulting distribution of the computation across the NUMA hierarchy can be arbitrarily bad. 
 This does not mean recursion is an inappropriate tool;
-%again,
+in fact,
 %as Section~\ref{sec:avoiding-hardness} discussed,
 applying recursion to problem-specific DAGs may yield immortal algorithms~\cite{mccoll99}--
-recall Section~\ref{sec:avoiding-hardness} for problem-specific approaches.
+recall also Section~\ref{sec:avoiding-hardness}.
 However,
 %this result indicates that 
 for general-purpose software that exhibit computations with arbitrary structure,
-distributing the computations over a NUMA hierarchy should never involve recursion.
+deciding how to distribute the computations over a NUMA hierarchy should never involve recursion.
 
 \subsubsection*{2) Hierarchical assignment}
 
 Consider instead optimal uniform partitioning ($d=1$),
 followed by an optimal assignment of the parts through an arbitrary NUMA hierarchy ($d>1$).
-\emph{If} both steps can indeed by done optimally in practice,
-the result is a $g_0$-approximation algorithm--
+If both steps can indeed be done optimally,
+the result is a $g_0$-approximation algorithm:
 the resulting distribution is off-optimal by a multiplicative factor proportional to the top-level data movement cost.
 Worst-case examples that achieve this bound can be constructed~\cite[Theorem 7.4]{hypergraphs_opdas}.
-Hierarchical assignment hence is preferable over recursion in a worst-case analysis,
-however,
+In a worst-case analysis,
+hierarchical assignment hence is preferable over recursion.
+However,
 the cost of ignoring hierarchy initially remains significant to the point that exploiting data locality lower in the hierarchy may be missed completely.
+
+\subsubsection*{3) Multi-level scheduling}
+
+These solutions take into account the full hierarchical description of the system,
+potentially during all of its phases:
+coarsening, solution refinement, uncoarsening, and the initial coarse-grained solve.
+Since during the whole process the entire hierarchy could be taken into account,
+no fundamental limits apply to this class of heuristic solution.
+Effectiveness, however,
+depends on specific algorithmic choices;
+the below summary includes model-based evaluations for specific such choices,
+and characterises solution quality over increasing $d$.
+Section~\ref{sec:onestopparallel} includes evaluation on real-world workloads.
 
 \subsubsection*{4) Separating vertical from horizontal data movement}
 
+%Similar to the result on recursion but now f
+For general multi-level scheduling with $d=2$ (i.e.\ MPP),
+one of our more recent results shows that considering horizontal data movement separate from vertical data movement can lead to arbitrarily bad solutions:
+the gap to optimality may be a multiplicative factor proportional to at least $n$ (i.e., $\Omega(n)$)~\cite[Theorem 4.1]{multiBSP_opdas}.
+%Whether communication occurs (a)synchronously does not affect this bound.
+Contemporary software stacks %,
+%HPC and otherwise,
+%it is worth noting,
+are nevertheless based on such a separation:
+the ScaLAPACK,
+for example,
+is a distributed-memory library for linear algebra solvers that relies on standard Basic Linear Algebra Subprograms (BLAS)~\cite{dongarra90,choi92}.
+The latter are provided by vendors as highly-optimised sequential libraries,
+and include the optimisation of vertical data movement through a memory hierarchy--
+whereas the ScaLAPACK manages horizontal data movement.
+Our model-based evaluation summarised below
+shows that this separation may lead to performance loss,
+especially for larger $d$.
+
 \subsubsection*{5) Communication scheduling}
+
+Consider starting from optimised work-to-processor assignments.
+Such assignments typically leave freedom of how to schedule inter-process data movement--
+required transfers may be overlapped with intermediate computation.
+While determining the optimal communication schedule is NP-hard~\cite{BSP_DAG_opdas}
+--recall Section~\ref{sec:scheduling-is-hard}--
+this sub-problem is a useful refinement step in both single-shot as well as multi-level heuristics.
+The below summary as well as Section~\ref{sec:onestopparallel} make use of this.
 
 \subsubsection*{6) Superstep scheduling}
 
-\subsubsection*{Summary}
+Assume that a given computation is already split into separate supersteps.
+To determine a parallel schedule,
+each superstep must be distributed across the $p$ processors in a way that accounts for the optimised transfer of data between supersteps.
+This leads to a variant of the $\epsilon$-balanced hypergraph partitioning problem,
+the \emph{layer-wise balanced partitioning problem}.
+While again an NP-hard and inapproximable problem~\cite[Theorem 5.2]{hypergraphs_opdas}
+we found a divide-and-conquer approach based on this separation effective for solving larger MPP problems~\cite{multiBSP_opdas},
+with results as summarised below.
 
-In conclusion, ...
-be careful with multi-level (distributed) scheduling
+\subsubsection*{Evaluation}
 
-gets worse with more NUMA levels (recap SPAA results)
+%In many of our works,
+We first employ model-based evaluation:
+given a computation and a schedule,
+as well as a computer system model (i.e., specific $d$ and $(p_i,g_i,l_i)_k$ with $k\in{\{0,1,\ldots,d-1\}}$),
+compute an abstract cost as prescribed by the Multi-BSP model.
+This allows evaluating heuristics on a set of benchmarks,
+and,
+for the smaller datasets,
+comparing heuristic solutions against optimal ones.
+Section~\ref{sec:onestopparallel} describes our heuristic approaches that combine the aforementioned categories $3$--$6$,
+as well as describes our approaches for determining optimal schedules.
+Employing a database of computational DAGs from a wide range of applications and consisting of both coarse- and fine-grained representations~\cite{HyperDAG_DB,BSP_algos_opdas},
+the below first summarises observations of practical import to software design.
+
+%Combining all aforementioned approaches $3$--$6$,
+Evaluations on machine architectures of increasing NUMA depth $d\in\{1,2,4\}$
+show improvements between $1.5$--$2.5\times$ when evaluated%
+\footnote{we report here geometric means since we are comparing different workloads across different system configurations}
+against traditional work-stealing approaches (the de-facto standard)
+as well as against state-of-the-art approaches~\cite{blumofe95,zarebavani2022hdagg}.
+Crucially,
+multi-level methods work particularly well for $d=4$,
+reaching speedups of $7.6\times$ and $4.7\times$ % versus the same baselines,
+compared to $3.4\times$ and $2.3\times$ for our direct heuristics.
+For smaller $d$, however, the direct heuristics outperform the multi-level approach.
+%Note that t
+%The largest speedup is obtained against the weakest baseline (randomised work stealing),
+%and the smaller speedup is measured against the state-of-the-art.
+The above results employ our NUMA-aware schedulers--
+limiting ourselves to producing uniform schedules,
+speedups are $1.3$--$1.7\times$ across all NUMA configurations and $1.7\times$ and $1.4\times$ for $d=4$.
+The latter stands in stark contrast to our NUMA-aware schedules,
+showing it becomes exponentially important to account for hierarchical data movement costs as system depth increases~\cite{BSP_algos_opdas}.
+
+Our newest model-based evaluations concern schedules that optimise combined horizontal and vertical data movement for $d=2$ (i.e., MPP).
+Evaluations show that decoupling minimising horizontal movement from vertical movement leads to a $12\%$ cost degradation,
+when assuming an optimal BSP schedule and an optimal clairvoyant algorithm.
+This degradation increases to $34\%$ when comparing against an online baseline:
+randomised work stealing and a standard LRU cache eviction policy.
+One caveat is that these results only involve the smallest DAGs from our benchmarks:
+computing optimal MPP schedules,
+even for modern commercial ILP solvers,
+are limited to $n=80$.
+For larger computations,
+a divide-and-conquer approach allows deriving optimised MPP schedules for $n$ up to $464$,
+resulting in speedups between $0.88$--$1.5\times$ versus the online baseline~\cite{multiBSP_opdas}.
+%These results show that o
+Optimising vertical and horizontal data movement separately from one another hence can come at a significant performance penalty,
+and effective software approaches that co-optimise both should be investigated.
 
 \subsection{Parallel frameworks and run-time systems}
 
@@ -635,7 +734,7 @@ Run-time systems:
 
 Frameworks:
 \begin{itemize}
-	\item novel approaches that automate usage of the above insights, e.g., ALP
+	\item novel approaches that automate usage of the above insights, e.g., ALP. Cite also Spampinato et al.\ as a POC example of a modern approach that considers horizontal and vertical data movement holistically
 	\item apply them for AI (e.g., are most AI ops still tensor contractions? Cite Intel work.)
 \end{itemize}
 
@@ -860,6 +959,9 @@ Given the success of our scheduler, we have applied it to the Huawei in-house ED
 
 
 \section{Conclusion}
+
+In conclusion, ...
+be careful with multi-level (distributed) scheduling
 
 For important kernels or classes of computation, nothing beats manual work (yet:)-- lower bounds, trade-off identifications, (poly-)algorithms that achieve them, combined with engineering efforts. Getting bounds though should not be skipped (engineers need to know what to aim for)
 
