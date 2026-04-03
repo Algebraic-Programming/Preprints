@@ -39,6 +39,24 @@
   organization={Springer}
 }
 
+@inproceedings{spampinato23a,
+ author = {Spampinato, Daniele G. and Jelovina, Denis and Zhuang, Jiawei and Yzelman, A. N.},
+ title = {Towards Structured Algebraic Programming},
+ year = {2023},
+ isbn = {9798400701696},
+ publisher = {Association for Computing Machinery},
+ address = {New York, NY, USA},
+ url = {https://doi.org/10.1145/3589246.3595373},
+ doi = {10.1145/3589246.3595373},
+ abstract = {Structured matrices and tensors exhibiting properties such as symmetry and fixed non-zero patterns are known for making algorithms and data storage more efficient. Due to emerging power and efficiency constraints required by the scale of modern scientific, machine learning, and edge computing applications, algorithm experts are revisiting traditional linear algebra algorithms with the goal of making new structures appear. Such structures often result from new numerical approximations that would greatly benefit from a more flexible linear algebra interface than standard BLAS and LAPACK, allowing for mixed precision and data types to appear in place of traditional floating-point operations. Algebraic programming interfaces, like GraphBLAS, while naturally abstracting the algebras of their operations, do not explicitly capture structured, densely stored arrays. In this paper, we present a preliminary design of a new algebraic programming interface for structured containers with template-generic, non-zero patterns. This interface offers to backend implementations the possibility of integrating more compile-time pattern information in the loop-based implementation of primitive operations as well as in the formulation of array accesses. We demonstrate its ability to specify important dense matrix decomposition algorithms and argue its ability to expose high-performance backends.},
+ booktitle = {Proceedings of the 9th ACM SIGPLAN International Workshop on Libraries, Languages and Compilers for Array Programming},
+ pages = {50--61},
+ numpages = {12},
+ keywords = {algebraic programming, dense linear algebra, structured matrices, mathematical software},
+ location = {Orlando, FL, USA},
+ series = {ARRAY 2023}
+}
+
 @inproceedings{jain20,
   title={Spectral lower bounds on the {I/O} complexity of computation graphs},
   author={Jain, Saachi and Zaharia, Matei},
@@ -101,6 +119,41 @@ numpages = {9}
   pages={55--71},
   year={1987},
   publisher={Elsevier}
+}
+
+@inproceedings{mastoras18,
+  title={Understanding parallelization tradeoffs for linear pipelines},
+  author={Mastoras, Aristeidis and Gross, Thomas R},
+  booktitle={Proceedings of the 9th International Workshop on Programming Models and Applications for Multicores and Manycores},
+  pages={1--10},
+  year={2018}
+}
+
+@inproceedings{mastoras23,
+  title={Studying the expressiveness and performance of parallelization abstractions for linear pipelines},
+  author={Mastoras, Aristeidis and Yzelman, Albert-Jan N},
+  booktitle={Proceedings of the 14th International Workshop on Programming Models and Applications for Multicores and Manycores},
+  pages={29--38},
+  year={2023}
+}
+
+@article{mastoras22a,
+author = {Mastoras, Aristeidis and Anagnostidis, Sotiris and Yzelman, A. N.},
+title = {Design and Implementation for Nonblocking Execution in {GraphBLAS}: Tradeoffs and Performance},
+year = {2023},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = 20,
+number = 1,
+articleno = 6,
+numpages = 23,
+issn = {1544-3566},
+url = {https://doi.org/10.1145/3561652},
+doi = {10.1145/3561652},
+abstract = {{GraphBLAS} is a recent standard that allows the expression of graph algorithms in the language of linear algebra and enables automatic code parallelization and optimization. GraphBLAS operations are memory bound and may benefit from data locality optimizations enabled by nonblocking execution. However, nonblocking execution remains under-evaluated. In this article, we present a novel design and implementation that investigates nonblocking execution in GraphBLAS. Lazy evaluation enables runtime optimizations that improve data locality, and dynamic data dependence analysis identifies operations that may reuse data in cache. The nonblocking execution of an arbitrary number of operations results in dynamic parallelism, and the performance of the nonblocking execution depends on two parameters, which are automatically determined, at run-time, based on a proposed analytic model. The evaluation confirms the importance of nonblocking execution for various matrices of three algorithms, by showing up to 4.11 \texttimes{} speedup over blocking execution as a result of better cache utilization. The proposed analytic model makes the nonblocking execution reach up to 5.13 \texttimes{} speedup over the blocking execution. The fully automatic performance is very close to that obtained by using the best manual configuration for both small and large matrices. Finally, the evaluation includes a comparison with other state-of-the-art frameworks for numerical linear algebra programming that employ parallel execution and similar optimizations to those discussed in this work, and the presented nonblocking execution reaches up to 16.1 \texttimes{} speedup over the state-of-the-art.},
+journal = {ACM Trans. Archit. Code Optim.},
+month = {March},
+keywords = {data locality, nonblocking execution, loop fusion, loop tiling, dynamic data dependence analysis, dynamic parallelism, analytic performance model, lazy evaluation, GraphBLAS}
 }
 
 @inproceedings{MPP_opdas,

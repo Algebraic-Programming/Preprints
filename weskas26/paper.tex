@@ -672,7 +672,7 @@ with results as summarised below.
 \subsubsection*{Evaluation}
 
 %In many of our works,
-We first employ model-based evaluation:
+We employ model-based evaluation:
 given a computation and a schedule,
 as well as a computer system model (i.e., specific $d$ and $(p_i,g_i,l_i)_k$ with $k\in{\{0,1,\ldots,d-1\}}$),
 compute an abstract cost as prescribed by the Multi-BSP model.
@@ -682,8 +682,9 @@ for the smaller datasets,
 comparing heuristic solutions against optimal ones.
 Section~\ref{sec:onestopparallel} describes our heuristic approaches that combine the aforementioned categories $3$--$6$,
 as well as describes our approaches for determining optimal schedules.
-Employing a database of computational DAGs from a wide range of applications and consisting of both coarse- and fine-grained representations~\cite{HyperDAG_DB,BSP_algos_opdas},
-the below first summarises observations of practical import to software design.
+Employing a database of computational DAGs from a wide range of applications% and consisting of both coarse- and fine-grained representations
+~\cite{HyperDAG_DB,BSP_algos_opdas},
+we first summarise observations of practical import to software design.
 
 %Combining all aforementioned approaches $3$--$6$,
 Evaluations on machine architectures of increasing NUMA depth $d\in\{1,2,4\}$
@@ -699,15 +700,16 @@ For smaller $d$, however, the direct heuristics outperform the multi-level appro
 %Note that t
 %The largest speedup is obtained against the weakest baseline (randomised work stealing),
 %and the smaller speedup is measured against the state-of-the-art.
-The above results employ our NUMA-aware schedulers--
+The above results employ NUMA-aware schedulers--
 limiting ourselves to producing uniform schedules,
 speedups are $1.3$--$1.7\times$ across all NUMA configurations and $1.7\times$ and $1.4\times$ for $d=4$.
-The latter stands in stark contrast to our NUMA-aware schedules,
-showing it becomes exponentially important to account for hierarchical data movement costs as system depth increases~\cite{BSP_algos_opdas}.
+The latter stands in stark contrast to the NUMA-aware schedules,
+demonstrating accounting for hierarchical data movement is crucial,
+especially with increasing system depth~\cite{BSP_algos_opdas}.
 
 Our newest model-based evaluations concern schedules that optimise combined horizontal and vertical data movement for $d=2$ (i.e., MPP).
-Evaluations show that decoupling minimising horizontal movement from vertical movement leads to a $12\%$ cost degradation,
-when assuming an optimal BSP schedule and an optimal clairvoyant algorithm.
+Evaluations show that decoupling minimising horizontal movement from vertical movement yields a $12\%$ cost degradation,
+even when using an optimal BSP schedule and an optimal clairvoyant algorithm.
 This degradation increases to $34\%$ when comparing against an online baseline:
 randomised work stealing and a standard LRU cache eviction policy.
 One caveat is that these results only involve the smallest DAGs from our benchmarks:
@@ -721,16 +723,57 @@ resulting in speedups between $0.88$--$1.5\times$ versus the online baseline~\ci
 Optimising vertical and horizontal data movement separately from one another hence can come at a significant performance penalty,
 and effective software approaches that co-optimise both should be investigated.
 
-\subsection{Parallel frameworks and run-time systems}
+\subsection{Run-time systems}
 
-A section on general advice for parallel frameworks and run-time systems
+Given a NUMA system such as depicted by Figure~\ref{fig:numa},
+one intuitive idea realises a matching hierarchical run-time system (RTS).
+Realising this in pure software results in different groups of processors,
+each controlled by a separate run-time system instance.
+Hardware schedulers strategically placed within the system hierarchy could lessen scheduling overheads.
+No matter the realisation,
+however,
+hierarchical scheduling should bear in mind the above results.
 
-Run-time systems:
-\begin{itemize}
-	\item arbitrary factors away from optimal applies when a scheduler has no knowledge about what other schedulers are doing
-	\item therefore, do distributed scheduling where schedulers have a (compressed/sketched) view of other schedulers: \emph{federated scheduling}
-	\item pattern-specific scheduling (pattern machines). Pipelines may be specifically useful, e.g., for serving. Recall parametrisation (cite work with Aris)
-\end{itemize}
+A hierarchical run-time system design where the top-level dispatches tasks to lower-level RTSes,
+for example,
+can result in arbitrarily bad schedules~\cite{hypergraphs_opdas,multiBSP_opdas}.
+Working around this limitation requires holistic scheduling approaches that consider the global state of the computation,
+and requires passing the lower-level RTSes information on what parts of the computation their peer holds.
+This need not be a full copy of how the global computation is distributed;
+instead, sketches of what other RTSes contain could be maintained.
+This results in a distributed run-time system where different components are aware of others' responsibilities,
+mimicking human organisation.
+for which we coin the phrase \emph{federated run-times}. % for this approach.
+
+Consider,
+as a concrete example,
+the techniques that exploit specific computational DAG structures outlined throughout Section~\ref{sec:avoiding-hardness}.
+Employing recursion to hierarchically distribute a cube DAG across a matching NUMA hierarchy,
+for example,
+leads to an immortal algorithm~\cite{mccoll99,valiant11}.
+Mapping this to federated run-times requires
+different RTSes at different levels in the hierarchy have the following information:
+%1) 
+that the global computation matches a cube DAG of some size $n$,
+%2) 
+full information about the sub-hierarchy of their parent ($d$ and  the various $p_i$, $g_i$, $l_i$), and
+%3) 
+its own position in the hierarchy.
+
+Practical realisations of this idea in RTSes exist e.g.\ for linear pipeline DAGs~\cite{mastoras18}.
+Linear pipelines occur naturally when dispatching computations to remote resources,
+in serving large-scale language models,
+with on-line streaming services in general, and
+in linear algebra computations sparse and dense~\cite{mastoras22a,spampinato23a}.
+This requires parametrisation not only within algorithms (allowing algorithms to adapt to systems; i.e., poly-algorithms),
+but also that algorithms drive federated run-time systems through parametrisation.
+This warrants a systematic separation of functional semantics from parametrisation,
+as argued by Mastoras and Yzelman for linear pipelines through annotations~\cite{mastoras23}.
+Applying this approach to general-purpose programming on federated systems,
+however,
+requires similar investigations for other DAG structures and could enjoy more systematic study by research and industry.
+
+\subsection{Programming frameworks}
 
 Frameworks:
 \begin{itemize}
