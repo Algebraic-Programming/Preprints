@@ -1,4 +1,175 @@
 
+@article{dongarra13,
+  title={Hierarchical {QR} factorization algorithms for multi-core clusters},
+  author={Dongarra, Jack and Faverge, Mathieu and Herault, Thomas and Jacquelin, Mathias and Langou, Julien and Robert, Yves},
+  journal={Parallel Computing},
+  volume={39},
+  number={4-5},
+  pages={212--232},
+  year={2013},
+  publisher={Elsevier}
+}
+
+@article{bisseling12,
+  title={Two-dimensional approaches to sparse matrix partitioning},
+  author={Bisseling, Rob H and Fagginger Auer, BO and Yzelman, AN and van Leeuwen, Tristan and Catalyurek, Umit V and others},
+  year={2012},
+  publisher={CRC Press}
+}
+
+@inproceedings{georganas21,
+  title={Tensor processing primitives: A programming abstraction for efficiency and portability in deep learning workloads},
+  author={Georganas, Evangelos and Kalamkar, Dhiraj and Avancha, Sasikanth and Adelman, Menachem and Anderson, Cristina and Breuer, Alexander and Bruestle, Jeremy and Chaudhary, Narendra and Kundu, Abhisek and Kutnick, Denise and others},
+  booktitle={Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis},
+  pages={1--14},
+  year={2021}
+}
+
+@unpublished{anastasiadis26a,
+  title={{PaHiS}: A Hierarchical Synchronous Parallel Model for Irregular Workloads},
+  author={Anastasiadis, Petros and Jelovina, D. and Yzelman, A. N.},
+  year=2026,
+  note={Submitted}
+}
+
+@inproceedings{solomonik13,
+  title={Cyclops tensor framework: Reducing communication and eliminating load imbalance in massively parallel contractions},
+  author={Solomonik, Edgar and Matthews, Devin and Hammond, Jeff and Demmel, James},
+  booktitle={2013 IEEE 27th International Symposium on Parallel and Distributed Processing},
+  pages={813--824},
+  year={2013},
+  organization={IEEE}
+}
+
+@misc{cutile_latest,
+  author       = {{NVIDIA Corporation}},
+  title        = {{cuTile}: A Tile-Based Programming Model for {NVIDIA} {GPUs}},
+  year         = {2025},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{https://github.com/nvidia/cutile-python}},
+  url          = {https://github.com/nvidia/cutile-python},
+  note         = {Accessed: 2026-04-06}
+}
+
+@inproceedings{tillet19,
+  title={Triton: an intermediate language and compiler for tiled neural network computations},
+  author={Tillet, Philippe and Kung, Hsiang-Tsung and Cox, David},
+  booktitle={Proceedings of the 3rd ACM SIGPLAN International Workshop on Machine Learning and Programming Languages},
+  pages={10--19},
+  year={2019}
+}
+
+@article{wang25,
+  title={Tilelang: A composable tiled programming model for {AI} systems},
+  author={Wang, Lei and Cheng, Yu and Shi, Yining and Tang, Zhengju and Mo, Zhiwen and Xie, Wenhao and Ma, Lingxiao and Xia, Yuqing and Xue, Jilong and Yang, Fan and others},
+  journal={arXiv preprint arXiv:2504.17577},
+  year={2025}
+}
+
+@misc{pypto_gitcode,
+  title={Huawei {PyPTO}: Parallel Tile Operator Framework},
+  author={{Huawei Technologies Co., Ltd.}},
+  year={2025},
+  url={https://gitcode.com/cann/pypto/}
+}
+
+@article{ching15,
+  title={One trillion edges: Graph processing at {Facebook}-scale},
+  author={Ching, Avery and Edunov, Sergey and Kabiljo, Maja and Logothetis, Dionysios and Muthukrishnan, Sambavi},
+  journal={Proceedings of the {VLDB} Endowment},
+  volume={8},
+  number={12},
+  pages={1804--1815},
+  year={2015},
+  publisher={{VLDB} Endowment}
+}
+
+@inproceedings{malewicz10,
+  title={Pregel: a system for large-scale graph processing},
+  author={Malewicz, Grzegorz and Austern, Matthew H. and Bik, Aart J. C. and Dehnert, James C. and Horn, Ilan and Leiser, Naty and Czajkowski, Grzegorz},
+  booktitle={Proceedings of the 2010 ACM SIGMOD International Conference on Management of data},
+  pages={135--146},
+  year={2010}
+}
+
+@article{dijkstra72,
+  title={The humble programmer},
+  author={Dijkstra, Edsger W},
+  journal={Communications of the ACM},
+  volume={15},
+  number={10},
+  pages={859--866},
+  year={1972},
+  publisher={ACM New York, NY, USA}
+}
+
+@misc{yzelman20,
+ author = "Yzelman, A. N. and Di Nardo, D. and Nash, J. M. and Suijlen, W. J.",
+ title = "A {C++} {GraphBLAS}: specification, implementation, parallelisation, and evaluation",
+ year = "2020",
+ keywords = "graph algorithms",
+ keywords = "linear algebra",
+ keywords = "C++",
+ keywords = "data-centric",
+ keywords = "auto-parallelisation",
+ keywords = "auto-vectorisation",
+ keywords = "high-performance computing",
+ keywords = "shared-memory",
+ keywords = "distributed-memory",
+ keywords = "cost modelling",
+ abstract = "The {GraphBLAS} is a programming model that expresses graph algorithms in linear algebraic terms. It takes an easy-to-use, data-centric view where algebraic operations execute over sparse or dense vectors and sparse matrices, parametrised in the algebra the computation should proceed with. We present a {C++ GraphBLAS} interface designed with both shared- and distributed-memory systems in mind. Our specification employs {STL}-compatible generic programming principles. Templates and type traits allow for enhanced compile-time error handling and optimisation, even for user-defined types and operators. Our specification guides algorithm designers towards writing performant code by attaching performance semantics to each operation.
+
+We detail a reference implementation that auto-vectorises and auto-parallelises user programs for sequential as well as shared- and distributed-memory parallel machines. We demonstrate the use of our {API} via two canonical graph algorithms, the k-nearest neighbourhood and {PageRank}. Weak and strong scaling experiments using real-world datasets with up to 42 billion edges show that the defined performance semantics are achievable in practice and capture key performance characteristics of the two selected algorithms. Microbenchmarks and throughput estimates from the PageRank algorithm on real-world graphs furthermore show that our reference implementation can extract near peak performance on different architectures.",
+ url = "\url{http://albert-jan.yzelman.net/PDFs/yzelman20.pdf}"
+}
+
+@article{yzelman22,
+  author = {Yzelman, A. N.},
+  title = {Humble Heroes},
+  journal = {Communications of Huawei Research},
+  volume = 6,
+  month = {June},
+  year = {2024},
+  pages = {146--170}
+}
+
+@techreport{pthreads_latest,
+  author      = {{IEEE Standards Association}},
+  title       = {{IEEE Standard for Information Technology}},
+  institution = {IEEE},
+  year        = {2024},
+  number      = {IEEE Std 1003.1-2024},
+  address     = {New York, NY, USA},
+  url         = {https://standards.ieee.org/ieee/1003.1/7700/}
+}
+
+@manual{openmp_latest,
+  title = {{OpenMP} Application Programming Interface Specification, Version 6.0},
+  author = {{OpenMP Architecture Review Board}},
+  year = {2024},
+  month = {Nov},
+  url = {https://www.openmp.org/specifications/}
+}
+
+@misc{suijlen19,
+  title={{Lightweight Parallel Foundations}: a model-compliant communication layer},
+  author={Suijlen, W. J. and Yzelman, A.N.},
+  eprint={1906.03196},
+  archivePrefix={arXiv},
+  primaryClass={cs.DC},
+  url={https://arxiv.org/abs/1906.03196},
+  year={2019}
+}
+
+@techreport{mpi_latest,
+  author = {{MPI} Forum},
+  title = {{MPI}: A Message-Passing Interface Standard Version 5.0},
+  year = {2025},
+  month = {June},
+  url = {https://www.mpi-forum.org/docs/mpi-5.0/mpi50-report.pdf}
+}
+
 @article{blumofe95,
   title={Cilk: An efficient multithreaded runtime system},
   author={Blumofe, Robert D and Joerg, Christopher F and Kuszmaul, Bradley C and Leiserson, Charles E and Randall, Keith H and Zhou, Yuli},
@@ -37,6 +208,52 @@
   pages={270--281},
   year={1995},
   organization={Springer}
+}
+
+@misc{ALP_website,
+  author = {Yzelman, A. N.},
+  title = {Algebraic Programming},
+  year = {2022},
+  howpublished = {\url{https://algebraic-programming.github.io}},
+  note = {Accessed: 2026-04-06},
+  url = {https://algebraic-programming.github.io}
+}
+
+@article{paszke19,
+  title={{Pytorch}: An imperative style, high-performance deep learning library},
+  author={Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and others},
+  journal={Advances in neural information processing systems},
+  volume={32},
+  year={2019}
+}
+
+@inproceedings{abadi16,
+  title={{TensorFlow}: a system for Large-Scale machine learning},
+  author={Abadi, Mart{\'\i}n and Barham, Paul and Chen, Jianmin and Chen, Zhifeng and Davis, Andy and Dean, Jeffrey and Devin, Matthieu and Ghemawat, Sanjay and Irving, Geoffrey and Isard, Michael and others},
+  booktitle={12th USENIX symposium on operating systems design and implementation (OSDI 16)},
+  pages={265--283},
+  year={2016}
+}
+
+@article{pedregosa11,
+  title={Scikit-learn: Machine learning in Python},
+  author={Pedregosa, Fabian and Varoquaux, Ga{\"e}l and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and others},
+  journal={the Journal of machine Learning research},
+  volume={12},
+  pages={2825--2830},
+  year={2011},
+  publisher={JMLR. org}
+}
+
+@article{zaharia16,
+  title={{Apache Spark}: a unified engine for big data processing},
+  author={Zaharia, Matei and Xin, Reynold S and Wendell, Patrick and Das, Tathagata and Armbrust, Michael and Dave, Ankur and Meng, Xiangrui and Rosen, Josh and Venkataraman, Shivaram and Franklin, Michael J and others},
+  journal={Communications of the ACM},
+  volume={59},
+  number={11},
+  pages={56--65},
+  year={2016},
+  publisher={Acm New York, NY, USA}
 }
 
 @inproceedings{spampinato23a,

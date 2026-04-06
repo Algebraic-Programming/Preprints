@@ -775,18 +775,77 @@ requires similar investigations for other DAG structures and could enjoy more sy
 
 \subsection{Programming frameworks}
 
-Frameworks:
-\begin{itemize}
-	\item novel approaches that automate usage of the above insights, e.g., ALP. Cite also Spampinato et al.\ as a POC example of a modern approach that considers horizontal and vertical data movement holistically
-	\item apply them for AI (e.g., are most AI ops still tensor contractions? Cite Intel work.)
-\end{itemize}
+Lower-level established ones often employed by ``hero programmers'' include
+POSIX Threads, OpenMP, and MPI~\cite{pthreads_latest,openmp_latest,mpi_latest},
+and allow programmers to achieve highest performance and optimal scalability.
+Modern programming frameworks instead tailor themselves to the humble programmer~\cite{dijkstra72},
+emphasising end-user productivity:
+resulting in higher-level frameworks such as
+Pregel~\cite{malewicz10,ching15},
+Scikit-learn~~\cite{pedregosa11},
+Spark~\cite{zaharia16},
+TensorFlow~\cite{abadi16}, and
+PyTorch~\cite{paszke19}.
+%Algebraic Programming~\cite{yzelman20}. %,ALP_website}.
+These frameworks often still achieve state-of-the-art performance,
+on-par with codes hand-written by the hero programmer in scalability and performance~\cite{yzelman22}.
 
+%Programming frameworks are the entry point to modern compute systems,
+%with
+Novel accelerators and custom interconnects
+%regularly cause 
+inspire departures from established programming frameworks,
+leading to novel frameworks both hero and humble~\cite{suijlen19,tillet19,yzelman20, ALP_website,wang25,cutile_latest,pypto_gitcode}.
+%Given the techniques conveyed in Sections~\ref{sec:avoiding-hardness} and \ref{sec:software-implications},
+%t
+The regular surfacing of novel programming frameworks translates to an opportunity:
+sufficiently high-level interfaces allow for the automatic application of the techniques this paper summarises.
+Frameworks like Cyclops and Algebraic Programming (ALP),
+for example,
+employ the optimality results on horizontal communication for cube DAGs from Section~\ref{sec:avoiding-hardness}
+for both dense linear algebra computations and tensor computations~\cite{solomonik13,spampinato23a}.
+ALP furthermore breaks with the classic separation between coarse-grained BLAS calls and MPI calls% from frameworks such as ScaLAPACK
+~\cite{choi92}
+by splitting matrices in smaller tiles that fit private caches.
+While BLAS use remains for the small tiles,
+the framework controls both horizontal and vertical data movement~\cite{mastoras22a,spampinato23a}.
+Similar techniques have shown to benefit run-time system integration~\cite{dongarra13}.
+%Inspired similar by work on linear pipelines~\cite{mastoras18},
+ALP also pioneers the automatic selection of performance parameters to the underlying run-time system~\cite{mastoras22a,anastasiadis26a},
+thus transparently applying the techniques from Section~\ref{sec:software-implications}.
+Early research suggests similar techniques apply to AI frameworks~\cite{georganas21}.
 
-\subsection{Irregular computations}
+Frameworks may also find cause to handle general scheduling problems,
+optimising schedules either as part of a compilation step or at run time.
+Two important scenarios could warrant such a decision.
+First,
+for the so-called \emph{irregular} class of computations,
+manual efforts are often outperformed by heuristic approaches to finding optimised schedules.
+This succeeds due to finding latent structures in underlying computation graphs,
+structures that are not known a priori.
+This approach is common within sparse computations~\cite{bisseling12}.
+Second,
+an application might repeat the same computation many times,
+yet escape manual analysis due to the complexities involved or due to the underlying computational graph varying in practice.
+Examples include inference serving,
+training large-scale AI models,
+and investigating alternative neural network designs or AI operators.
+Rather than awaiting repeated significant human investment to find
+lower bounds,
+optimal algorithms,
+appropriate parametrisations,
+and integration with production software,
+it may instead be appealing to automate this search and repeatedly solve the underlying scheduling problems.
+PyPTO is an example of such a framework~\cite{pypto_gitcode}, and
+Section~\ref{sec:onestopparallel} overviews both optimal approaches for small-scale problems as well as ones for larger-scale ones.
 
-note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
-
-Index good approaches for problems that are inherently irregular (and thus cannot, to significant degree, avoid hardness)
+%AJ: moved the irregular computations sections partially to be weaved in the above text,
+% while some of the remainder could be moved to the motivation instead of here
+%\subsection{Irregular computations}
+%
+%note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
+%
+%Index good approaches for problems that are inherently irregular (and thus cannot, to significant degree, avoid hardness)
 
 
 \section{OneStopParallel}
