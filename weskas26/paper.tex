@@ -213,8 +213,8 @@ and we proved finding polynomial-time algorithms that approach optimal solutions
 yet practice does regularly realise software that achieves near-optimal performance on parallel architectures and systems.
 
 This is possible by working around hardness,
-principally by \emph{not} consider scheduling as a general problem--
-and instead to focus on scheduling specific (classes of) computations.
+principally by \emph{not} considering scheduling as a general problem--
+and instead focusing on scheduling specific computations.
 This section introduces common approaches along the different types of data movement:
 \begin{enumerate}
 	\item horizontal data movement (communication);
@@ -237,7 +237,7 @@ the case of irregular computations.
 \label{sec:avoiding-communication}
 
 Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation.
-One such model, the Bulk Synchronous Parallel (BSP) model, %developed during the late 80s,
+One such model, BSP, %developed during the late 80s,
 %comes with two modes of operation, one automatic and one manual~\cite{valiant90}. %:
 %one automatic, where programs are expressed sequentially and through hashing of program data, executable in parallel in a fully scalable fashion; and
 %one manual, where programs explicitly coordinate computation and communication%, and potentially differ at different processes
@@ -283,7 +283,7 @@ Consider the visual representation of a one-dimensional FFT of length $n=8$ depi
 This so-called \emph{butterfly graph} consists of three phases, and of $\log n$ phases for general $n$.
 When distributing the computation over multiple processors, different vertices are assigned to different processes.
 Edges between vertices assigned to different processors induce communication between processes.
-By cutting the graph horizontally, we visually confirm the computation may proceed embarrasingly parallel for the first phase up to $p\leq4$,
+By cutting the graph horizontally, we visually confirm the computation may proceed in parallel without communication for the first phase up to $p\leq4$,
 while the first two phases may be computed concurrently for up to $p\leq2$ processors.
 Figure~\ref{fig:fft-n8-p2} visualises the latter,
 from which we observe that this particular DAG partitioning results in exactly $n$ cut edges.
@@ -294,7 +294,7 @@ The above arguments that reason about a fixed butterfly DAG structure extend to 
 %and may apply to other models of computation as well~\cite{papadimitriou88}.
 
 Given that the sequential FFT algorithm has a work cost proportional to $n\log n$
---and any computation that maps to a butterfly graph a work cost that is \emph{at least} proportional to $n\log n$--
+--and any computation that maps to a butterfly graph has a work cost that is \emph{at least} proportional to $n\log n$--
 the total parallelisation cost of $(n\log n)/p$ is optimal%
 \footnote{assuming the work associated with each vertex has homogeneous cost
 and that $p$ is large enough compared to $n$},
@@ -327,7 +327,9 @@ Colloquially, algorithms backed by (or resulting from) such proofs of optimality
 \end{figure}
 
 Let us consider two matrices $A, B$ both of size $n\times n$, and the matrix--matrix multiplication $C=AB$.
-Figure~\ref{fig:gemm-n4} depicts the resulting DAG for $n=4$, where,
+Figure~\ref{fig:gemm-n4} depicts the internal nodes%
+\footnote{i.e., the DAG excluding the input and output nodes}
+of the resulting DAG for $n=4$, where,
 for example, the matrix $A$ could span the horizontal and vertical axes (the front of the cube),
 the matrix $B$ the horizontal and depth axes (the top of the cube),
 and the output matrix $C$ the vertical and depth axes (the side of the cube)--
@@ -386,8 +388,8 @@ tried and tested approaches,
 applicable to a wide range of problems.
 Common DAG structures not discussed here include diamond DAGs for e.g.\ matrix decompositions~\cite{tiskin02,petitet16,sao18,ballard18} and $k$-ary trees for e.g.\ broadcasts~\cite{papadimitriou88,gerbessiotis94},
 while the analysis on cube DAGs can straightforwardly be extended to $d$-dimensional hyper-cubes for capturing, e.g., tensor contractions.
-Algorithm analysis based on specific DAG structures avoid NP-hardness and inapproximability,
-leading to practical state-of-the-art algorithms and software without solving hard scheduling problems in software.
+Algorithm analysis based on specific DAG structures avoids NP-hardness and inapproximability,
+leading to practical state-of-the-art algorithms and software without solving hard scheduling problems.
 
 However,
 applying these approaches requires a human in the loop,
@@ -404,12 +406,15 @@ and required concepts from category theory to formulate~\cite{koopman25}.
 
 \subsection{Vertical data movement}
 
-Vertical data movement concerns data movement from slow to fast memory,
-assuming computations only execute on the latter fast memory,
-and is otherwise known as I/O.
+Vertical data movement,
+also known as I/O,
+concerns data movement from slow to fast memory and assumes computations can only take place on data in fast memory.
 Here, too, we may determine lower bounds and find algorithms that achieve them.
-The framework under which lower bounds are proven is given by the so-called \emph{red-blue pebble game}~\cite{HongKung}, and
-one often-used intuition for developing I/O lower bounds is to find sub-structures of the computation for which data reuse within limited work space is maximised.
+%The framework under which lower bounds are proven is given by the so-called \emph{red-blue pebble game}~\cite{HongKung}, and
+%one 
+An
+often-used intuition for developing I/O lower bounds within the framework of Hong and Kung~\cite{HongKung}
+finds sub-structures of the computation for which data reuse within limited work space is maximised.
 
 % specific DAG structures
 
@@ -462,7 +467,6 @@ individual results are specific to problems and require human expertise to estab
 Jain and Zaharia suggest spectral partitioning methods to methodologically derive lower bounds on I/O costs~\cite{jain20},
 potentially simplifying this effort--
 however, these bounds are not strict and may not find practically useful bounds always.
-\ajy{To Andras or Toni: do we show this in one of our papers actually? (If yes, should cite it here.)}
 More crucially for practice, lower bounds on I/O typically are not sufficient in modern use cases:
 contemporary systems are parallel and must be driven by parallel algorithms,
 and therefore horizontal communication must be considered.
@@ -584,7 +588,7 @@ and summarises their model-based evaluations.
 
 \subsubsection*{1) Recursion}
 
-Consider partitioning as a sub-class of partitioning problems first,
+Consider first partitioning as a sub-class of scheduling problems,
 and consider a Multi-BSP (NUMA) hierarchy of depth $d=2$.
 We showed that even when assuming optimal oracles for the uniform partitioning problem ($d=1$),
 combining the optimal solutions in a recursive approach for $d>1$ results in solutions that are up to $\Omega(n)$ away from optimal%
@@ -742,7 +746,7 @@ and requires passing the lower-level RTSes information on what parts of the comp
 This need not be a full copy of how the global computation is distributed;
 instead, sketches of what other RTSes contain could be maintained.
 This results in a distributed run-time system where different components are aware of others' responsibilities,
-mimicking human organisation.
+mimicking human organisation,
 for which we coin the phrase \emph{federated run-times}. % for this approach.
 
 Consider,
@@ -775,9 +779,10 @@ requires similar investigations for other DAG structures and could enjoy more sy
 
 \subsection{Programming frameworks}
 
-Lower-level established ones often employed by ``hero programmers'' include
+Lower-level established programming models often employed %by ``hero programmers''
+include
 POSIX Threads, OpenMP, and MPI~\cite{pthreads_latest,openmp_latest,mpi_latest},
-and allow programmers to achieve highest performance and optimal scalability.
+and allow expert programmers to achieve highest performance and optimal scalability.
 Modern programming frameworks instead tailor themselves to the humble programmer~\cite{dijkstra72},
 emphasising end-user productivity:
 resulting in higher-level frameworks such as
