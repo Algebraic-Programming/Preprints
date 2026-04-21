@@ -192,53 +192,96 @@ the optimal surplus cost cannot be approximated within polynomial time to a mult
 to the problem size $n$--
 meaning, any polynomial scheduling algorithm for general DAGs can be an almost arbitrary factor away from optimal.
 This hardness result restricts itself to the case $T_p$ and $T_\text{seq}$ are derived from the same underlying DAG
-(i.e., the notions of parallel overhead and surplus cost are intended to show different things),
+%(i.e., the notions of parallel overhead and surplus cost are intended to show different things),
 and holds both with and without recomputation~\cite{BSP_DAG_opdas,replication_opdas}.
-
-\ajy{Should we add a paragraph on model variations their inter-relations here or elsewhere?}
-
 
 \subsection{Hardness of scheduling: vertical data movement} %: communication and I/O}
 
-Another vital aspect of scheduling computations in practice is vertical data movement. This concept is not included in the basic BSP model: % for simplicity: 
 BSP only considers the cost of moving data horizontally from the memory associated with one processor to memory associated with another. However, when executing real computations -- even those that employ just a single processor -- one of the most important factors is that fast memory in the system (e.g.\ cache) often has very limited capacity, whereas we also have some other memory (e.g.\ RAM) with much larger capacity but drastically slower latency and throughput. In practice, often the cost of moving data from slow memory to fast memory (or vice versa) is the bottleneck of executing practical computations.
+Thus, another vital aspect of scheduling computations is vertical data movement,
+otherwise known as I/O cost.
 
-This vertical communication cost (also known as I/O cost) is most often analyzed in the so-called \emph{red-blue pebble game} of Hong and Kung~\cite{HongKung}. This is essentially a single-processor scheduling problem in a two-level memory hierarchy (with e.g.\ cache and RAM), where the goal is to minimize the I/O operations while executing the computations.
-%The red-blue pebble game has been widely used to analyze the I/O cost of algorithms and also to develop I/O lower bounds for many important computations, such as matrix multiplication, fast Fourier transform or attention in neural networks~\cite{HongKung,Saha}. However, in 
-For general DAGs, finding the optimal I/O cost is again a problem that is NP-hard to approximate to any reasonable factor~\cite{MPP_opdas}.
+The \emph{red-blue pebble game} of Hong and Kung~\cite{HongKung} serves as a basis for analysing I/O cost.
+This game represents a single-processor scheduling problem in a two-level memory hierarchy (with e.g.\ cache and RAM), where the goal is to minimize the I/O operations while executing the computations.
+%The red-blue pebble game has 
+Using it, researchers have analysed the I/O cost of a large variety of algorithms and developed lower bounds for many important computations, such as matrix multiplication, fast Fourier transform or attention in neural networks~\cite{HongKung,Saha}.
+We discuss these algorithm-specific approaches further in Section~\ref{sec:avoiding-hardness};
+for general DAGs, however,
+finding the optimal I/O cost is again a problem that is NP-hard to approximate to any reasonable factor~\cite{MPP_opdas}.
 
+\subsection{Combined horizontal \& vertical data movement}
 
-\subsection{Hardness of scheduling: combined horizontal \& vertical data movement}
+For a more realistic model of parallel computation,
+the BSP model that captures multiple processors and horizontal communication
+should be combined with the red-blue pebble game that captures memory limitations and I/O costs.
+Our work generalises the red-blue pebble game to a parallel setting with unit data movement costs (pebbling) and with realistic data movement costs $g,l$ (BSP),
+resulting in the multi-processor red-blue pebbling model (MPP), respectively, the more complex Multi-BSP model~\cite{valiant11}.
+Furthermore,
+modern memory subsystems are increasingly hierarchical:
+increasingly deep and wide.
+Savage extended the Hong and Kung to multiple levels~\cite{savage95},
+subsumed by MPP and Multi-BSP that naturally also apply to deeper NUMA hierarchies~\cite{valiant11,MPP_opdas,multiBSP_opdas}.
+We denote by depth $d=1$ the basic pebbling case of having both a fast and slow memory,
+while every added layer in the memory hierarchy increases $d$.
 
-For a more realistic model of paralellizing computations, one needs to combine the BSP model, which allows multiple processors and horizontal communication, with this red-blue pebble game that captures memory limitations and I/O costs for the single-processor case. Generalising the red-blue pebble game to a parallel setting results in a multi-processor red-blue pebbling model (MPP)~\cite{MPP_opdas}. Incorporating vertex weights and latency costs, we obtain the more complex Multi-BSP model~\cite{multiBSP_opdas} with $d=1$. These combinations offer much more realistic models for the scheduling problem, but on the other hand, finding the optimal solution for such more complex models becomes even more challenging-- see Section~\ref{sec:avoiding-hardness:numa}. 
-
-while the hardness results for both BSP scheduling and red-blue pebbling carry over to these combined models~\cite{MPP_opdas}, optimal schedules are essentially impossible to find. Even so, both theoretical and experimental study of these models still offer valuable insights. For instance, one can analyze the difference between holistic scheduling strategy that aims to find a solution for the entire problem, and a two-stage approach that first comes up with a good parallelization strategy, and then combines this with a cache management strategy to optimize I/O costs. On the theoretical side, one can show a worst-case example where the two-stage schedule is a very large factor away from the actual optimum, even if both stages are optimal separately. On the experimental side, one can confirm that the holistic view can indeed outperform the two-stage approach by a small margin~\cite{multiBSP_opdas}.
-\ajy{double-check that what is in this paragraph is already conveyed by Section 5, and if not, move it there}
-
-
-\subsection{Two-level scheduling}
-
-\todo{Start with Savage and then go into full multi-bsp?}
-
-NP-, APX-hardness, counter-examples, arbitrary factors away from optimum
-
+The hardness of both BSP scheduling and red-blue pebbling carry over to these combined models:
+if the special cases of $p=1$ and $d=1$ are NP-hard and inapproximable in polynomial time,
+then the general cases for $p,d$ are as well.
+Nevertheless,
+some notion of relative hardness may be established:
+one can show a worst-case example where the two-stage schedule is an arbitrary factor $\Omega(n)$ away from optimal,
+even if both stages are optimal separately~\cite{MPP_opdas}.
+Such results can inspire algorithmic approaches for scheduling over NUMA systems--
+for example, Section~\ref{sec:avoiding-hardness:numa} confirms that holistic scheduling can indeed outperform two-stage scheduling, %~\cite{multiBSP_opdas},
+a result that should inspire modern software design. % for NUMA systems.
 
 \subsection{Partial computations}
 \label{sec:partial-pebbling}
 
 %The multi-processor red-blue pebbling or MBSP models above already capture most of the key factors of scheduling a computation. However, there are of course many further aspects that could be incorporated into the model to make it even more realistic. Here we briefly discuss one of these extensions: partial computations.
 
-For simplicity, the original red-blue pebble game assumes that every operation is computed in one go, requiring all of its inputs in fast memory simultaneously. However, if the operation is e.g.\ the addition or multiplication of numerous inputs, then in practice, it can also be executed in multiple steps: we first aggregate only some of the input values, maybe even save this partial results into slow memory and load it back later, then continue with another subset of the inputs, and so on. Such a partial computing strategy might allow for a lower I/O cost in some cases, and might even be required to realise a feasible solution if, e.g., the operation has a very high number of inputs.
+%For simplicity, t
+The original red-blue pebble game assumes that every operation is computed in one go, requiring all of its inputs in fast memory simultaneously. However, if the operation is e.g.\ the addition or multiplication of numerous inputs, then it can also be executed in multiple steps: we first aggregate only some of the input values, maybe even save this partial results into slow memory to load it back later, and then continue with another subset of the inputs. Such a partial computing strategy might allow for a lower I/O cost in some cases, and might even be required to realise a feasible solution if, e.g., the operation has a high number of inputs.
 
-The red-blue pebble game can naturally be extended with such partial computations to allow for a more realistic model of I/O costs~\cite{partial_opdas,sobczyk2026complexity}. From a theoretical perspective, this extended model is rather similar to the original game in terms of e.g.\ inapproximability. 
-\ajy{follow with the concrete results in hardness}
+The red-blue pebble game can naturally be extended with such partial computations to allow for a more realistic model of I/O costs~\cite{sobczyk2026complexity,partial_opdas}.
+%From a theoretical perspective, this extended model is rather similar to the original game in terms of e.g.\ inapproximability. 
+%\ajy{follow with the concrete results in hardness}
+In this model,
+we establish NP-hardness for determining whether the optimum is affected by allowing partial computation or not,
+show the difference between optimal solutions with and without pebbling can be the full multiplicative factor $n$,
+and prove there is no polynomial-time algorithm that approximates the optimum to any useful multiplicative or additive factor~\cite{partial_opdas}.
+Regardless,
+we can establish useful lower bounds for specific algorithms and find algorithms that achieve them:
+the next section details the intuitions and tools,
+both when partial computations are allowed and not.
 
-Moreover, one of the most important tools related to red-blue pebbling is so-called $S$-partitions, which were widely used to derive lower bounds on matrix multiplication, fast Fourier transform, neural network attention, and many other computations~\cite{HongKung,Saha}. These S-partitions and the corresponding proofs can also be adjusted to the partial computing model, which allows to derive the same I/O lower bounds with partial computations (up to constant factors) for the example computations mentioned above.
-\todo{state the concrete bounds? it would require introducing a LOT of notation...}  
+%Moreover, one of the most important tools related to red-blue pebbling is so-called $S$-partitions, which were widely used to derive lower bounds on matrix multiplication, fast Fourier transform, neural network attention, and many other computations~\cite{HongKung,Saha}. These $S$-partitions and the corresponding proofs can also be adjusted to the partial computing model, which allows to derive the same I/O lower bounds with partial computations (up to constant factors) for the example computations mentioned above.
+%\todo{state the concrete bounds? it would require introducing a LOT of notation...}  
+%AJ: this is already in Section 4
 
-However, we also emphasize that in general, partial computations can enable significantly different pebbling strategies. For instance, they can notably reduce the optimal I/O cost in sparse matrix-vector multiplications, or even by a linear factor in some synthetic examples~\cite{partial_opdas}.
-\todo{Determining optimal schedules using ILP formulations at least as hard as the non-partial case (?) - needed?}
-\ajy{the above two paragraphs should move to Section 4}
+
+\subsection{Realism versus complexity}
+
+While MPP and Multi-BSP --augmented with partial computations or not-- offer increasingly realistic models for the scheduling problem, %but on the other hand, finding the optimal solution for such more complex models becomes even more challenging.
+they increase the complexity of finding optimal DAG schedules.
+Do we absolutely require the increased realism in our models?
+
+For horizontal data movement,
+we indexed model variations beyond those described in this exposition and related them to additional established models.
+In particular, we identified a taxonomy that captures not only BSP,
+but also the Hockney (alpha-beta) and single-port duplex models~\cite{hockney94,ozkaya19}.
+Crucially, the work relates how optimal solutions in different models relate within constant factors~\cite[Thm.~1]{BSP_DAG_opdas}:
+if absolute performance need not be 100\% or can be achieved via later optimisation pass,
+selecting the simplest model for horizontal communication thus suffices.
+
+However,
+even the simplest model has no practically useable approximation algorithm for all possible input DAGs,
+while crucial workloads and complex system architectures mandate the use of the more intricate models described above.
+Sections~\ref{sec:avoiding-hardness} to \ref{sec:onestopparallel} discuss dealing with the hardness of these problems by,
+in turn,
+expert humans in the loop,
+software automation of expert strategies, and
+sophisticated algorithms that find optimised schedules automatically and despite the established hardness of doing so.
 
 
 \section{Avoiding hardness by avoiding generality}
@@ -560,6 +603,12 @@ Several classic algorithms fall under this definition,
 for which he demonstrates that applying the tool yields useful lower bounds for matrix--matrix multiplication, fast Fourier transform, and sorting~\cite{valiant11}.
 The tool also applies to MPP (Multi-BSP with $d=2$) and
 to horizontal communication ($d=1$, i.e., BSP).%, as treated in Section~\ref{sec:avoiding-communication}).
+
+(Re partial computations)
+However, we also emphasize that in general, partial computations can enable significantly different pebbling strategies. For instance, they can notably reduce the optimal I/O cost in sparse matrix-vector multiplications, or even by a linear factor in some synthetic examples~\cite{partial_opdas}.
+\todo{Determining optimal schedules using ILP formulations at least as hard as the non-partial case (?) - needed?}
+\ajy{tmake sure the above is already in Section 4}
+
 
 \section{Implications on software design}
 \label{sec:software-implications}
@@ -892,6 +941,11 @@ Section~\ref{sec:onestopparallel} overviews both optimal approaches for small-sc
 %note that irregular problems cannot escape hardness, e.g., SpMV, and point forward to the specific subsection
 %
 %Index good approaches for problems that are inherently irregular (and thus cannot, to significant degree, avoid hardness)
+
+\ajy{TODO: double-check that the below is already in this Section somewhere}
+%optimal schedules are essentially impossible to find.
+Even so, both theoretical and experimental study of these models still offer valuable insights. For instance, one can analyze the difference between holistic scheduling strategy that aims to find a solution for the entire problem, and a two-stage approach that first comes up with a good parallelization strategy, and then combines this with a cache management strategy to optimize I/O costs. On the theoretical side, one can show a worst-case example where the two-stage schedule is a very large factor away from the actual optimum, even if both stages are optimal separately. On the experimental side, one can confirm that the holistic view can indeed outperform the two-stage approach by a small margin~\cite{multiBSP_opdas}.
+\ajy{double-check that what is in this paragraph is already conveyed by Section 5, and if not, move it there}
 
 
 \section{OneStopParallel}
