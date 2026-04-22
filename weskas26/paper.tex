@@ -160,7 +160,8 @@ The complexity of problems is computer science is often defined via the concept 
 
 Besides NP-hardness, there are other concepts that show that the problem is even more challenging. Inapproximability, for instance, means that even  finding a solution that is close to the optimal value is NP-hard. ``Close to optimal'' here means a solution that is a constant multiplicative or additive factor away from optimal. Parameterized complexity, on the other hand, studies whether the problem remains hard if some parameters of the input are fixed to a small value. Here, the crux lies with exposing a parameter that is suitably constrained in practical applications.
 
-\subsection{Hardness of scheduling: horizontal data movement}  %when data movement has nonzero latency and throughput costs}
+\subsection{Horizontal data movement}  %when data movement has nonzero latency and throughput costs}
+\label{sec:scheduling-is-hard:horizontal}
 
 \begin{figure}
 	\centering
@@ -179,7 +180,7 @@ A classic notion in parallel computing is that of overhead:
 the difference between the computational resources used versus simply running a sequential algorithm to solve the problem,
 or,
 more formally,
-$$O(n.p)=pT_p(n)-T_\text{seq}(n).$$
+$$O(n,p)=pT_p(n)-T_\text{seq}(n).$$
 Here,
 $T_\text{seq}(n)$ represents the cost (e.g., time) of a sequential algorithm to solve the given problem of some size $n$,
 while $T_p(n)$ represents the cost of parallel solution when using $p$ processors~\cite{grama02}.
@@ -195,7 +196,8 @@ This hardness result restricts itself to the case $T_p$ and $T_\text{seq}$ are d
 %(i.e., the notions of parallel overhead and surplus cost are intended to show different things),
 and holds both with and without recomputation~\cite{BSP_DAG_opdas,replication_opdas}.
 
-\subsection{Hardness of scheduling: vertical data movement} %: communication and I/O}
+\subsection{Vertical data movement} %: communication and I/O}
+\label{sec:scheduling-is-hard:vertical}
 
 BSP only considers the cost of moving data horizontally from the memory associated with one processor to memory associated with another. However, when executing real computations -- even those that employ just a single processor -- one of the most important factors is that fast memory in the system (e.g.\ cache) often has very limited capacity, whereas we also have some other memory (e.g.\ RAM) with much larger capacity but drastically slower latency and throughput. In practice, often the cost of moving data from slow memory to fast memory (or vice versa) is the bottleneck of executing practical computations.
 Thus, another vital aspect of scheduling computations is vertical data movement,
@@ -210,6 +212,7 @@ for general DAGs, however,
 finding the optimal I/O cost is again a problem that is NP-hard to approximate to any reasonable factor~\cite{MPP_opdas}.
 
 \subsection{Combined horizontal \& vertical data movement}
+\label{sec:scheduling-is-hard:combined}
 
 For a more realistic model of parallel computation,
 the BSP model that captures multiple processors and horizontal communication
@@ -237,6 +240,7 @@ a result that should inspire modern software design. % for NUMA systems.
 
 \subsection{Partial computations}
 \label{sec:partial-pebbling}
+\label{sec:scheduling-is-hard:partial}
 
 %The multi-processor red-blue pebbling or MBSP models above already capture most of the key factors of scheduling a computation. However, there are of course many further aspects that could be incorporated into the model to make it even more realistic. Here we briefly discuss one of these extensions: partial computations.
 
@@ -287,31 +291,35 @@ sophisticated algorithms that find optimised schedules automatically and despite
 \section{Avoiding hardness by avoiding generality}
 \label{sec:avoiding-hardness}
 
-Scheduling while taking into account realistic costs hence is hard,
-and we proved finding polynomial-time algorithms that approach optimal solutions to some useful factor is impossible--
+We have shown that scheduling under realistic cost models hard,
+%and we proved finding polynomial-time algorithms that approach optimal solutions to some useful factor is impossible--
 yet practice does regularly realise software that achieves near-optimal performance on parallel architectures and systems.
-Some specific positive results do indeed exist:
+Positive results --meaning polynomial-time algorithms that find the optimum or approximate it within a useable factor--
+do indeed exist:
 for example,
-polynomial-time algorithms exist for DAGs only consisting of independent chains and for a small number of processors.
-While these positive examples are of theoretical interest,
-the resulting algorithms remain very inefficient in practice~\cite{BSP_DAG_opdas}.
+polynomial-time solutions exist for DAGs consisting only of independent chains and for a small number of processors~\cite{BSP_DAG_opdas,MPP_opdas,partial_opdas,multiBSP_opdas}.
+%While these positive examples are of theoretical interest,
 
-More convincing results similarly work by avoiding hardness by \emph{not} considering scheduling as a general problem--
+While resulting algorithms remain very inefficient in practice~\cite{BSP_DAG_opdas},
+the above example does illustrate how to successfully avoid hardness:
+%More convincing results similarly work by avoiding hardness
+by \emph{not} considering scheduling as a general problem,
 and instead focusing on scheduling specific computations or specific types of computations.
 This section introduces common approaches along the different types of data movement:
 \begin{enumerate}
 	\item horizontal data movement (communication);
 	\item vertical data movement (I/O); and
-	\item data movement through NUMA hierarchies.
+	\item data movement through NUMA hierarchies (combined model).
 \end{enumerate}
 We focus on techniques %by which the high-performance computing (HPC) community has operated in the last few decades,
 %which principially considers proving 
-that prove optimality for specific problems or specific classes of problems.
-Finding such bounds allows discovering algorithms that achieve them.
+that prove optimality for specific problems or specific classes of problems for each type.
+%Finding such bounds allows discovering algorithms that achieve them.
 %Such problem-specific approaches have reliably led to algorithms and software that indeed achieve optimal performance in practice.
 %This approach stands in stark contrast to finding solutions that work in the most generic cases.
-We couple outlining these state-of-the-art methodologies with novel insights from our research: we discuss
-recursive and hierarchical approaches for dealing with NUMA,
+We couple outlining these state-of-the-art methodologies with novel insights from our research--
+for example,
+we discuss recursive and hierarchical approaches for dealing with NUMA,
 implications on run-time system design for modern large-scale computing systems,
 implications on parallel frameworks for AI and beyond, and
 the case of irregular computations.
@@ -319,21 +327,24 @@ the case of irregular computations.
 \subsection{Horizontal data movement}
 \label{sec:avoiding-communication}
 
-Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation.
-One such model, BSP, %developed during the late 80s,
+Minimisation of horizontal data movement, i.e., communication minimisation, comes naturally when adopting a model of computation that assigns explicit costs to data movement and synchronisation,
+such as,
+indeed,
+BSP~\cite{valiant90}.
+%One such model, BSP, developed during the late 80s,
 %comes with two modes of operation, one automatic and one manual~\cite{valiant90}. %:
 %one automatic, where programs are expressed sequentially and through hashing of program data, executable in parallel in a fully scalable fashion; and
 %one manual, where programs explicitly coordinate computation and communication%, and potentially differ at different processes
 %~\cite{valiant90}.
 %In both cases, the cost model revolves not only around work,
 %but also 
-revolves around supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models}.
+This model revolves around supersteps and $h$-relations that together quantify the cost of data movement-- see Section~\ref{sec:cost-models}.
 Costs are parametrised in the number of processors $p$ and some problem-specific parameter $n$, such as a problem size.
 %To recall, the related system parameters are $g$, the cost of sending one word, and $l$, the cost of moving from one superstep to the next-- principially, making sure that any necessary communications are completed before continuing, and $p$, the number of processing units in the parallel system.
 %Compute costs are hence expressed in terms of $g$ and $l$, while parameterised in $p$ and some problem size $n$.
 %AJ: check later if we do indeed need to recall more of these definitions
 The key phrase here is \emph{problem-specific}:
-in HPC, by far most known algorithms are %manual-mode 
+in HPC, by far most known practical parallel algorithms are %manual-mode 
 BSP, and
 literature is rich with examples of optimal algorithms or algorithms that operate within an optimal trade-off regime.
 %By contrast, most highly scalable big-data frameworks instead operate by automatic-mode BSP, and achieve an \emph{expected} cost of $\mathcal{O}(n/p)$, where $n$ here could be taken as proportional to the number of data accesses the sequential program requires.
@@ -369,11 +380,15 @@ Edges between vertices assigned to different processors induce communication bet
 By cutting the graph horizontally, we visually confirm the computation may proceed in parallel without communication for the first phase up to $p\leq4$,
 while the first two phases may be computed concurrently for up to $p\leq2$ processors.
 Figure~\ref{fig:fft-n8-p2} visualises the latter,
-from which we observe that this particular DAG partitioning results in exactly $n$ cut edges.
+from which we furthermore observe that this particular DAG partitioning results in exactly $n$ cut edges.
 The communication from phase two to three furthermore is balanced amongst the processors--
 the communication cost hence is proportional to $n/p$,
-while the number of supersteps is one and processor-local work is proportional to $(n\log n)/p$.
-The above arguments that reason about a fixed butterfly DAG structure extend to an achievable lower bound for general $n$~\cite{papadimitriou88,valiant90,inda01}.%,
+while the number of supersteps is one and the processor-local work is proportional to $(n\log n)/p$.
+These bounds,
+derived solely by analysing the computational DAG structure,
+can be achieved by practical algorithms
+%The above arguments that reason about a fixed butterfly DAG structure extend to an achievable lower bound
+for general $n$~\cite{papadimitriou88,valiant90,inda01}.%,
 %and may apply to other models of computation as well~\cite{papadimitriou88}.
 
 Given that the sequential FFT algorithm has a work cost proportional to $n\log n$
@@ -383,7 +398,7 @@ the total parallelisation cost of $(n\log n)/p$ is optimal%
 and that $p$ is large enough compared to $n$},
 and any computation that maps to a butterfly graph can be optimally parallelised
 by this singular lower-bound analysis and parallelisation recipe.
-Colloquially, algorithms backed by (or resulting from) such proofs of optimality are known as \emph{immortal} algorithms.
+Colloquially, algorithms backed by (or resulting from) such proofs of optimality are known as \emph{immortal algorithms}.
 
 \subsubsection*{Matrix--matrix multiplication}
 
@@ -422,7 +437,7 @@ All vertices shown correspond to multiplications $a_{ik}b_{kj}$ of the canonical
 which, along the edges towards $C$, are summed into the output $c_{ij}$.
 
 In the same vein as for the FFT,
-we may construct a parallel algorithm by exploiting the geometric features of the resulting cube DAG.
+we may construct a parallel algorithm by exploiting the geometric features of the underlying cube DAG.
 While coloring vertices to specific processors, again edges between differently-coloured nodes will induce communication.
 Therefore the work distribution that minimises communication is one that minimises such cuts,
 which in the case of a cube means identifying $p$ volumes for which the surface areas (where edge cuts occur) are minimised.
@@ -442,21 +457,24 @@ while communication- and work-optimal, the processor-local memory requirement is
 larger than the ideal bound of $n^2/p$.
 Subdividing the matrices $A$, $B^T$, and $C$ into $p$ square blocks results in the so-called 2D algorithms,
 which are work- and memory-optimal with costs proportional to $n^3/p$ and $n^2/p$, respectively.
-Such algorithms are not communication-optimal, however,
+These algorithms are not communication-optimal, however,
 as processors need to communicate $\sqrt{p}-1$ blocks of size $n^2/p$ over $\sqrt{p}-1$ supersteps to maintain memory optimality.
 %The sum of communication costs are proportional to $n^2/p^{1/2}$, which is higher than $n^2/p^{2/3}$.
 Figure~\ref{fig:gemm-n4-p4} depicts the resulting work distribution for $n=p=4$,
 which visualises a higher surface-to-volume ratio compared to the 3D algorithm,
 leading to the suboptimal communication cost.
 
-The existence of both 2D and 3D algorithms points to a discrete trade-off space between optimality in communication and memory,
-indeed confirmed through lower-bound studies~\cite{irony04}.
-This, in turn,
+Indeed there exists a discrete trade-off space between optimality in communication and optimality in memory,
+confirmed by theoretical studies~\cite{irony04}.
+%indeed confirmed through lower-bound studies~\cite{irony04}.
+%This, in turn,
+This
 identifies an opportunity for programs to, when available,
-use more memory in order to reduce communication.
-These decisions may be made automatically at run-time.
+use more memory in order to reduce communication--
+such decisions could even be made automatically,
+at run-time.
 To realise this, algorithms must first be \emph{parametrised} not only in $p$, but also in $g$, $l$, and available system memory.
-A thus-parametrised \emph{poly-algorithm} may then dispatch,
+A thus-parametrised so-called \emph{poly-algorithm} may then dispatch,
 at run-time,
 to the best-possible algorithmic variant-- whether that is 2D, 3D, or something in-between.
 In the case of matrix multiplication,
@@ -466,53 +484,52 @@ is indeed realisable~\cite{mccoll99}.
 
 \subsubsection*{Generalisability}
 
-Analysing specific problems and classes of problems through their DAG structure are well-known,
-tried and tested approaches,
+Analysing specific problems and classes of problems through their DAG structure is a well-known,
+tried and tested approach,
 applicable to a wide range of problems.
-Common DAG structures not discussed here include diamond DAGs for e.g.\ matrix decompositions~\cite{tiskin02,petitet16,sao18,ballard18} and $k$-ary trees for e.g.\ broadcasts~\cite{papadimitriou88,gerbessiotis94},
-while the analysis on cube DAGs can straightforwardly be extended to $d$-dimensional hyper-cubes for capturing, e.g., tensor contractions.
+Common DAG structures not discussed here include diamond DAGs for e.g.\ matrix decompositions~\cite{tiskin02,petitet16,sao18,ballard18} and $k$-ary trees for e.g.\ broadcasts~\cite{papadimitriou88,gerbessiotis94}.
+The analysis on cube DAGs can furthermore be extended to $d$-dimensional hyper-cubes for general tensor contractions and (thus) modern AI workloads.
 Algorithm analysis based on specific DAG structures avoids NP-hardness and inapproximability,
 leading to practical state-of-the-art algorithms and software without solving hard scheduling problems.
 
 However,
-applying these approaches requires a human in the loop,
+applying this approach requires a human in the loop,
 and come at the cost of problem-specificity.
-Oftentimes the approach requires significant expertise, compounding this cost.
+It requires significant expertise, compounding the human cost.
 Consider, for example, multi-dimensional FFTs,
 for which the de-facto standard today applies 1D FFTs in different directions,
 requiring data transpositions between directions when executing in parallel~\cite{popovici20}.
-This again corresponds to butterfly DAGs as in Figure~\ref{fig:butterfly-DAGs},
-and by repeating the argument for 1D FFTs,
+The full multi-dimensional FFT again corresponds to a butterfly DAGs, % as in Figure~\ref{fig:butterfly-DAGs},
+and by repeating the argument sketched earlier,
 a lower bound of $n/p$ data movement in one superstep again emerges-- even for higher-dimensional FFTs.
-However, a practical algorithm that matches these bounds was only recently discovered, more than three decades later~\cite{koopman23},
+However, a practical algorithm that matches these bounds was only recently discovered~\cite{koopman23}
+--more than three decades after lower bound results that motivated BSP~\cite{valiant90}--
 and required concepts from category theory to formulate~\cite{koopman25}.
 
 \subsection{Vertical data movement}
 
-Vertical data movement,
-also known as I/O,
+To recall,
+vertical data movement,
+or I/O, %also known as I/O,
 concerns data movement from slow to fast memory and assumes computations can only take place on data in fast memory.
-Here, too, we may determine lower bounds and find algorithms that achieve them.
-%The framework under which lower bounds are proven is given by the so-called \emph{red-blue pebble game}~\cite{HongKung}, and
-%one 
-An
-often-used intuition for developing I/O lower bounds within the framework of Hong and Kung~\cite{HongKung}
-finds sub-structures of the computation for which data reuse within limited work space is maximised.
-
-% specific DAG structures
-
-Lower bounds for,
+I/O is government by the red-blue pebbling game~\cite{HongKung} in much the same way as horizontal data movement is governed by BSP.
+Here too,
+we may determine lower bounds and find algorithms that achieve them.
+This operates similarly as for horizontal computation in that specific DAG structures are typically analysed,
+%but differs in that the usual intuition by which lower bounds are constructed:
+%we find sub-structures of the computation for which data reuse within limited work space is maximised.
+%Hence,
+resulting in
+lower bounds for,
 e.g.,
 the fast Fourier transform (FFT), sorting, permuation, and transposition,
-may be found by fixing the directed acyclic graphs (DAGs) to specific structures matching the problem of interest--
-such as, again, butterflies for the FFT as depicted in Figure~\ref{fig:butterfly-DAGs}.
-Lower bound proofs make use of the specifics of the DAG structure.
-Algorithms can then be realised that achieve those bounds~\cite{aggarwal88}.
+may be found. %by fixing the directed acyclic graphs (DAGs) to specific structures matching the problem of interest--
+%such as, again, butterflies for the FFT as depicted in Figure~\ref{fig:butterfly-DAGs}.
+%Lower bound proofs make use of the specifics of the DAG structure.
+Algorithms that match such bounds have been realised~\cite{aggarwal88}.
 
-% limited work space
-
-One common I/O lower bound proof strategy,
-introduced with the red-blue pebble game,
+One common tool for proving lower bounds was % I/O lower bound proof strategy,
+introduced with the red-blue pebble game, and
 revolves around so-called \emph{$S$-partitions}.
 Suppose the available fast memory is limited to $r$ words. %,
 %which directly corresponds to the number of red pebbles.
@@ -523,7 +540,7 @@ Finding the fewest such sub-structures that together cover all nodes in the DAG%
 \footnote{while not introducing cycles}
 recovers a partition that
 1) completes the computation (due to the sub-structures covering all nodes), and
-2) leads to a lower bound on I/O (due to finding the minimal number of sub-structures).
+2) leads to a lower bound on I/O (due to finding the minimal required number of sub-structures).
 The earliest I/O bounds on matrix--matrix multplication, for example, follow this strategy~\cite{HongKung,toledo99,irony04},
 and these bounds are realisable by practical algorithms~\cite{rutledge52,mckellar69}.
 
@@ -534,25 +551,35 @@ canonical ones discovered in the past century~\cite{HongKung,aggarwal88,toledo99
 but also for recent algorithms such as the transformative FlashAttention~\cite{Saha}.
 Similar to established approaches for minimising communication,
 these methods are tried and tested,
-and often lead to optimal sequential algorithms.
+and lead to optimal sequential algorithms.
 
-The classic red-blue pebble game does not account for partial computations:
-materialising a single output through accumulating $k$ inputs often does not require that all inputs reside in fast memory before the computation can commence--
-accumulation could, for example, proceed using $r<k$ memory by using well-known blocking and tiling techniques.
-Extending the game to account for partial computations generalises the classic approach,
-and was first explored by Sobczyk~\cite{sobczyk2026complexity}.
-We extended the classic $S$-partition concept from Hong and Kung to one able to prove lower bounds in this partial pebbling game~\cite{partial_opdas},
-which again leads to lower bounds attainable by practical algorithms such as for the FFT, matrix--matrix multiplication, and FlashAttention~\cite{partial_opdas}--
-recall also Section~\ref{sec:partial-pebbling}.
+The classic red-blue pebble game does not account for partial computations %:
+where outputs may be computed while not all inputs are in fast memory simultaneously--
+see Section~\ref{sec:partial-pebbling}.
+%materialising a single output through accumulating $k$ inputs often does not require that all inputs reside in fast memory before the computation can commence--
+%accumulation could, for example, proceed using $r<k$ memory by using well-known blocking and tiling techniques.
+%Extending the game to account for partial computations generalises the classic approach,
+%and was first explored by Sobczyk~\cite{sobczyk2026complexity}.
+The difference can be noticeable in practice:
+for matrix--vector multiplication with a vector of size $n$, for instance,
+accounting for partial computations can reduce the I/O cost by $n-1$ moves~\cite{partial_opdas}.
+%For this model,
+We hence extend the $S$-partition notion to prove lower bounds in this partial pebbling game,
+and prove that the resulting tool retains similar utility as the original Hong and Kung one. % ~\cite{partial_opdas},
+Using it,
+indeed,
+we find lower bounds that take partial computations into account %for several important problems that are attainable by known practical algorithms
+for the FFT, matrix--matrix multiplication, and FlashAttention~\cite{partial_opdas}.
 
 Although this approach hence too is generalisable across computations and refined models,
-individual results are specific to problems and require human expertise to establish.
-Jain and Zaharia suggest spectral partitioning methods to methodologically derive lower bounds on I/O costs~\cite{jain20},
+individual results are specific to problems and require in-depth human expertise to establish.
+Jain and Zaharia suggest spectral partitioning methods to methodologically derive lower bounds on I/O costs for specific DAG structures~\cite{jain20},
 potentially simplifying this effort--
-however, these bounds are not strict and may not find practically useful bounds always.
-More crucially for practice, lower bounds on I/O typically are not sufficient in modern use cases:
+however, resulting bounds are not strict,
+meaning it may well reveal lower bounds that are not attainable in practice. %and may not find practically useful bounds always.
+More crucially, however, lower bounds on I/O are no longer sufficient in modern usage:
 contemporary systems are parallel and must be driven by parallel algorithms,
-and therefore horizontal communication must be considered.
+and therefore horizontal communication must be considered also.
 
 \subsection{NUMA}
 \label{sec:avoiding-hardness:numa}
@@ -564,50 +591,49 @@ and therefore horizontal communication must be considered.
 	\label{fig:numa}
 \end{figure}
 
-Combining horizontal with vertical data movement results in multi-processor pebbling (MPP),
-a recent pebbling game extension proposed by us~\cite{MPP_opdas}.
-This generalisation results in yet another hard and practically inapproximable problem,
-even without modeling an arbitrarily deep NUMA hierarchy as found in contemporary CPUs, accelerators, and system interconnects.
-Figure~\ref{fig:numa} pictures such a NUMA structure.
-Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
-modeling memory limitations at each level~\cite{valiant11}.
-Multi-BSP with depth $d=2$ and zero latency results in the same model as MPP.
+Modern compute systems have increasingly deep memory hierarchies such as depicted by Figure~\ref{fig:numa}.
+Moving data from a processor (i.e., one of the leafs) to a direct neighbour within the same subtree can be done at lower latency and higher throughput,
+when compared to moving the same data to a processor that is not in the same subtree.
+Contemporary CPUs, accelerators, and even system interconnects exhibit such non-uniform memory access (NUMA) behaviour,
+while the depth and width of the hierarchies tend to increase.
+%To deal with modern compute systems,
+We introduced models that combine horizontal and vertical data movement:
+MPP and Multi-BSP.
+Section~\ref{sec:scheduling-is-hard:vertical} introduced these and established their hardness and inapproximability for memory hierarchies of some given depth $d$.
+%Combining horizontal with vertical data movement results in multi-processor pebbling (MPP),
+%a recent pebbling game extension proposed by us~\cite{MPP_opdas}.
+%This generalisation results in yet another hard and practically inapproximable problem,
+%even without modeling an arbitrarily deep NUMA hierarchy as found in contemporary CPUs, accelerators, and system interconnects.
+%Figure~\ref{fig:numa} pictures such a NUMA structure.
+%Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
+%modeling memory limitations at each level~\cite{valiant11}.
+We recall that Multi-BSP with depth $d=2$, unit $g$, and zero latency reduces to MPP.
 
-While for BSP finding optimal schedules for reasonably-sized DAGs is possible %when commercial ILP solvers are available 
-(see Section~\ref{sec:onestopparallel}),
-doing the same for MPP is restricted to DAGs with tens of nodes only--
-and require in the order of several hours of compute time.
-%with ILP solvers given a several-hour budget.
-This is unlikely to lead to satisfactory practical results,
-especially for $d>2$ or when incorporating latency costs,
-even when allotting days of scheduling compute time. %instead of hours.
-Recursive and hierarchical approaches may reduce the computational complexities of dealing with $d>1$--
-%but are not effective in general,
-%and should not be applied without thorough consideration.
-Section~\ref{sec:avoiding-numa} details those.
-A more fundamental solution prevents computationally expensive searches for optimised schedules across NUMA hierarchies by,
-again, considering specific DAG structures.
-%These may be analysed to find lower bounds on combined horizontal and vertical data movement,
-%accounting for both latency and throughput costs.
-Proving problem-specific lower bounds, however, can be a tedious process
---even more so in a model that combines BSP and an hierarchical I/O model~\cite{valiant90,savage95}--
+We may again consider specific DAG structures,
+prove lower bounds,
+and design algorithms and software that achieve them.
+Given the increased model complexity principally due their increased number of parameters from just one $(r)$ and three $(p, g, l)$ for pebbling and BSP, respectively, to approximately $d$ and $4d$ parameters for MPP and Multi-BSP,
+this process becomes significantly harder in these more sophisticated models--
+%Proving problem-specific lower bounds, however, can be a tedious process
+%--even more so in a model that combines BSP and an hierarchical I/O model~\cite{valiant90,savage95}--
 %which is what Multi-BSP and MPP require.
-that must be followed with equally-tedious manual algorithm design,
-a process that must be repeated for every workload of interest.
-
-For Multi-BSP, Valiant proposes to relax the notion of optimality to be within a factor $d$, and
+%that must be followed with equally-tedious manual algorithm design,
+%a process that 
+and
+must furthermore be repeated for every workload of interest.
+Combating this complexity,
+Valiant proposes to relax the notion of optimality to be within a factor $d$, and
 provides a mathematical tool that simplifies determining lower bounds for arbitrary hierarchies.
-This tool applies for any so-called \emph{$w(S)$-limited straight-line programs}:
+This tool applies for any \emph{$w(S)$-limited straight-line program}:
 programs for which any subset of operations that takes at most $S$ inputs and produces at most $S$ outputs contains no more than $w(S)$ work.
 Several classic algorithms fall under this definition,
-for which he demonstrates that applying the tool yields useful lower bounds for matrix--matrix multiplication, fast Fourier transform, and sorting~\cite{valiant11}.
-The tool also applies to MPP (Multi-BSP with $d=2$) and
-to horizontal communication ($d=1$, i.e., BSP).%, as treated in Section~\ref{sec:avoiding-communication}).
+for some of which he demonstrates deriving useful lower bounds:
+matrix--matrix multiplication, fast Fourier transform, and sorting~\cite{valiant11}.
+%The tool also applies to MPP (Multi-BSP with $d=2$, unit $g$, and zero $l$) and could be viewed to generalise $S$-partitions (for $p=1$).
+%to horizontal communication ($d=1$, i.e., BSP), as treated in Section~\ref{sec:avoiding-communication}).
 
-(Re partial computations)
-However, we also emphasize that in general, partial computations can enable significantly different pebbling strategies. For instance, they can notably reduce the optimal I/O cost in sparse matrix-vector multiplications, or even by a linear factor in some synthetic examples~\cite{partial_opdas}.
-\todo{Determining optimal schedules using ILP formulations at least as hard as the non-partial case (?) - needed?}
-\ajy{tmake sure the above is already in Section 4}
+%However, we also emphasize that in general, partial computations can enable significantly different pebbling strategies. For instance, they can notably reduce the optimal I/O cost in sparse matrix-vector multiplications, or even by a linear factor in some synthetic examples~\cite{partial_opdas}.
+%AJ: this original sentence by Andras is now spread over sections 3 and 4 -- the synthetic remark is in section 3, whereas the real-world example is in this section
 
 
 \section{Implications on software design}
@@ -816,6 +842,21 @@ resulting in speedups between $0.88$--$1.5\times$ versus the online baseline~\ci
 %These results show that o
 Optimising vertical and horizontal data movement separately from one another hence can come at a significant performance penalty,
 and effective software approaches that co-optimise both should be investigated.
+
+\ajy{double-check that section 5.1 indeed contains what is below here}
+While for BSP finding optimal schedules for reasonably-sized DAGs is possible %when commercial ILP solvers are available 
+(see Section~\ref{sec:onestopparallel}),
+doing the same for MPP is restricted to DAGs with tens of nodes only--
+and require in the order of several hours of compute time.
+%with ILP solvers given a several-hour budget.
+This is unlikely to lead to satisfactory practical results,
+especially for $d>2$ or when incorporating latency costs,
+even when allotting days of scheduling compute time. %instead of hours.
+Recursive and hierarchical approaches may reduce the computational complexities of dealing with $d>1$--
+%but are not effective in general,
+%and should not be applied without thorough consideration.
+Section~\ref{sec:avoiding-numa} details those.
+\ajy{end double-check (but note that a remainder part should be double-checked to be contained in Section 6}
 
 \subsection{Run-time systems}
 
@@ -1031,6 +1072,9 @@ The web interface furthermore supports downloading the generated schedules, and 
 TODO add an image of a visualized schedule here?
 
 TODO mention partitioning, pebbling algorithms? Spectral stuff? Ubuntu /Spack package? 
+
+\pap{Determining optimal schedules using ILP formulations for partial pebbling is at least as hard as the non-partial case (?) - needed?}
+\ajy{my take on this is it depends on what you mean -- if it's a hardness result, it should go to Section 3. If it's a practical observation on ILP formulations, it should go to Section 6 here?}
 
 
 \section{Results}
