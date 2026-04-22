@@ -607,7 +607,7 @@ Section~\ref{sec:scheduling-is-hard:vertical} introduced these and established t
 %Figure~\ref{fig:numa} pictures such a NUMA structure.
 %Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
 %modeling memory limitations at each level~\cite{valiant11}.
-We recall that Multi-BSP with depth $d=2$, unit $g$, and zero latency reduces to MPP.
+We recall that Multi-BSP with depth $d=1$, unit $g$, and zero latency reduces to MPP.
 
 We may again consider specific DAG structures,
 prove lower bounds,
@@ -629,8 +629,7 @@ programs for which any subset of operations that takes at most $S$ inputs and pr
 Several classic algorithms fall under this definition,
 for some of which he demonstrates deriving useful lower bounds:
 matrix--matrix multiplication, fast Fourier transform, and sorting~\cite{valiant11}.
-%The tool also applies to MPP (Multi-BSP with $d=2$, unit $g$, and zero $l$) and could be viewed to generalise $S$-partitions (for $p=1$).
-%to horizontal communication ($d=1$, i.e., BSP), as treated in Section~\ref{sec:avoiding-communication}).
+%The tool also applies to MPP (Multi-BSP with $d=1$, unit $g$, and zero $l$) and could be viewed to generalise $S$-partitions (for $p=1$) and to generalise to handle horizontal communication ($d=1$, i.e., BSP), as treated in Section~\ref{sec:avoiding-communication}).
 
 %However, we also emphasize that in general, partial computations can enable significantly different pebbling strategies. For instance, they can notably reduce the optimal I/O cost in sparse matrix-vector multiplications, or even by a linear factor in some synthetic examples~\cite{partial_opdas}.
 %AJ: this original sentence by Andras is now spread over sections 3 and 4 -- the synthetic remark is in section 3, whereas the real-world example is in this section
@@ -706,7 +705,9 @@ and summarises their model-based evaluations.
 
 Consider first partitioning as a sub-class of scheduling problems,
 and consider a Multi-BSP (NUMA) hierarchy of depth $d=2$.
+\ajy{be careful here given the unified definition of $d$ (which is different from this one used here)-- TODO}
 We showed that even when assuming optimal oracles for the uniform partitioning problem ($d=1$),
+\ajy{same here}
 combining the optimal solutions in a recursive approach for $d>1$ results in solutions that are up to $\Omega(n)$ away from optimal%
 \footnote{the big-Omega notation means \emph{at least} proportional to, in this case, the number of vertices in the DAG},
 where $n$ is the number of vertices in the computational DAG~\cite[Lemma 7.2]{hypergraphs_opdas}--
@@ -724,6 +725,7 @@ deciding how to distribute the computations over a NUMA hierarchy should never i
 \subsubsection*{2) Hierarchical assignment}
 
 Consider instead optimal uniform partitioning ($d=1$),
+\ajy{definition of $d$ has updated -- TODO}
 followed by an optimal assignment of the parts through an arbitrary NUMA hierarchy ($d>1$).
 If both steps can indeed be done optimally,
 the result is a $g_0$-approximation algorithm:
@@ -751,6 +753,7 @@ Section~\ref{sec:onestopparallel} includes evaluation on real-world workloads.
 
 %Similar to the result on recursion but now f
 For general multi-level scheduling with $d=2$ (i.e.\ MPP),
+\ajy{update to new definition of $d$-- TODO}
 one of our more recent results shows that considering horizontal data movement separate from vertical data movement can lead to arbitrarily bad solutions:
 the gap to optimality may be a multiplicative factor proportional to at least $n$ (i.e., $\Omega(n)$)~\cite[Theorem 4.1]{multiBSP_opdas}.
 %Whether communication occurs (a)synchronously does not affect this bound.
@@ -828,6 +831,7 @@ demonstrating accounting for hierarchical data movement is crucial,
 especially with increasing system depth~\cite{BSP_algos_opdas}.
 
 Our newest model-based evaluations concern schedules that optimise combined horizontal and vertical data movement for $d=2$ (i.e., MPP).
+\ajy{update to newer definition of $d$--TODO}
 Evaluations show that decoupling minimising horizontal movement from vertical movement yields a $12\%$ cost degradation,
 even when using an optimal BSP schedule and an optimal clairvoyant algorithm.
 This degradation increases to $34\%$ when comparing against an online baseline:
