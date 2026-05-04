@@ -6,6 +6,7 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{tikz}
+\usetikzlibrary{fit,backgrounds,arrows.meta}
 \usetikzlibrary{arrows.meta}
 
 % Equations, Tables, and Figures have numbering within section
@@ -1189,17 +1190,106 @@ Given the success of our scheduler, we have applied it to the Huawei in-house ED
 \end{figure}
 
 
-
-
-
-
-
-
-
-
+\newpage
 
 \subsection{Mixture of experts}
 
+In a Mixture-of-Experts (MoE) model, each layer contains many potential experts, but during a single inference pass only a small subset of these experts is activated for each input. This sparse activation pattern means that, at runtime, the model does not use all experts simultaneously. Instead, it dynamically selects only a few experts per layer based on the input. Since different prompts trigger different combinations of experts, the activation frequency of each expert group can vary widely.
+
+\begin{figure}[!htbp]
+	\centering
+	\begin{tikzpicture}[
+		expert/.style={
+			circle, draw, thick,
+			minimum size=8mm,
+			fill=white
+		},
+		mla/.style={
+			rectangle, draw, thick,
+			rounded corners,
+			minimum width=14mm,
+			minimum height=8mm,
+			fill=gray!10
+		},
+		edge/.style={
+			-{Latex[length=2.5mm]},
+			thick
+		},
+		groupA/.style={
+			draw=blue!70,
+			fill=blue!12,
+			rounded corners,
+			inner sep=6pt,
+			thick
+		},
+		groupB/.style={
+			draw=orange!90!black,
+			rounded corners,
+			inner sep=8pt,
+			thick,
+			dashed
+		},
+		groupC/.style={
+			draw=green!60!black,
+			rounded corners,
+			inner sep=10pt,
+			thick,
+			dotted
+		}
+		]
+		
+		% MLA nodes
+		\node[mla] (mla1) at (0,0) {MLA$_1$};
+		\node[mla] (mla2) at (5,0) {MLA$_2$};
+		
+		% Expert nodes
+		\node[expert] (e1) at (2.5,  1.6) {$e_1$};
+		\node[expert] (e2) at (2.5,  0.8) {$e_2$};
+		\node[expert] (e3) at (2.5,  0.0) {$e_3$};
+		\node[expert] (e4) at (2.5, -0.8) {$e_4$};
+		\node[expert] (e5) at (2.5, -1.6) {$e_5$};
+		
+		% Highlight overlapping expert subgroups
+		\begin{scope}[on background layer]
+			% subgroup {e1,e2}: filled region
+			\node[groupA, fit=(e1)(e2),inner ysep=2pt,  yshift=2pt] {};
+			
+			% subgroup {e3,e4}: dashed outline
+			\node[groupB, fit=(e3)(e4), inner ysep=0pt, inner xsep=8pt, yshift=-2pt] {};
+			
+			% subgroup {e4,e5}: dotted outline, slightly larger so overlap is visible
+			\node[groupC, fit=(e4)(e5), inner ysep=2pt, inner xsep=10pt, yshift=-2pt] {};
+		\end{scope}
+		
+		% Directed connections MLA1 -> experts
+		\foreach \e in {e1,e2,e3,e4,e5}
+		\draw[edge] (mla1) -- (\e);
+		
+		% Directed connections experts -> MLA2
+		\foreach \e in {e1,e2,e3,e4,e5}
+		\draw[edge] (\e) -- (mla2);
+		
+		% Group labels
+		\node[blue!70] at (3.25, 1.2) {\scriptsize $f_1$};
+		\node[orange!90!black] at (3.35,-0.4) {\scriptsize $f_2$};
+		\node[green!60!black] at (3.45,-1.2) {\scriptsize $f_3$};
+		
+	\end{tikzpicture}
+	\caption{Simplified hypergraph of two MoE layers. Each colored group has its own frequency $f_e$. The ILP uses these frequencies to decide which experts and MLAs should be placed on the same device.}
+	\label{fig:moe_mla_expert_groups_directed}
+\end{figure}
+
+Profiling these activation patterns across a large dataset of user prompts allows us to identify which groups of experts are frequently selected together. This information is crucial for model distribution: experts that often co-activate can be co-located on the same device to reduce cross-device communication, while rarely co-activated experts can be placed independently to improve memory usage and computational load balancing.
+
+To incorporate this profiled activation-frequency data into the placement problem, we transform the model's computational graph into a hypergraph. A hypergraph is a generalization of a graph in which each edge, called a hyperedge, can connect any number of nodes rather than exactly two. In our formulation, nodes represent experts in the model, and each hyperedge represents a set of experts activated together during a single inference step. The weight of a hyperedge, $f_e$, is the observed activation frequency of that group, estimated by profiling the model on a dataset of real user prompts. In this way, the hypergraph directly encodes how often different groups of experts are used in practice, providing the basis for efficient MLA and expert placement decisions.
+
+Given this hypergraph representation, we formulate the placement problem as an ILP that jointly determines where experts and MLA blocks should be placed. The objective is to minimize the connectivity, or $(\lambda - 1)$, metric. For each hyperedge $e$, let $\lambda_e$ denote the number of devices intersected by that hyperedge. If $\lambda_e = 1$, all experts activated together are placed on the same device and no cross-device communication is required. If $\lambda_e > 1$, the request may require data from multiple devices, producing a communication cost proportional to $\lambda_e - 1$. Therefore, minimizing this metric encourages frequently co-activated experts to be placed together, especially when their hyperedge has a large activation frequency $f_e$.
+
+The ILP uses binary decision variables to assign model components, such as experts and MLA blocks, to devices. These placement variables also determine the communication pattern implicitly: whenever components that are used together are placed on different devices, data movement is required. Thus, the optimization does not need to model every data transfer explicitly; instead, communication is captured through the hypergraph connectivity induced by the placement.
+
+The formulation is subject to several placement and resource constraints. By default, each expert is assigned to exactly one partition, although this restriction can be relaxed when expert replication is allowed. Each device must also respect its memory capacity $M$, which is especially important for MoE models because expert weights are large in aggregate and KV caches may vary dynamically with the workload.
+
+Finally, the formulation accounts for MLA placement. Since MLA blocks should preferably be close to the experts they serve, this preference can be modeled either by including MLA blocks in the corresponding hyperedges or by adding a penalty term that discourages separating them from important expert groups. The strength of this penalty can be scaled by the activation frequency of the corresponding hyperedge. In addition, each MLA block is required to be replicated on at least \texttt{MIN\_REPLICAS} and at most \texttt{MAX\_REPLICAS} devices, while an additional constraint prevents placing multiple replicas of the same MLA block on a single device.
 
 
 
