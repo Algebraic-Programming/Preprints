@@ -93,16 +93,6 @@ computation as a (Hyper)DAG
 
 scheduling is not partitioning
 
-\begin{figure}
-	\centering
-	\resizebox{.47\textwidth}{!}{\input{tikz/part_sched.tikz}}
-	\caption{
-		Here's a picture for "scheduling is not partitioning", if needed. Old description is in comments.
-		%Illustration of a partitioning (top) and a scheduling (bottom) for the same DAG, with $k=2$ processors. The partitioning only assigns the nodes to processors. While the partitioning in the figure is completely balanced (it assigns $9$ nodes to both groups), it does not allow any parallelization due to the precedence constraints: all subtasks of processor $1$ need to be finished before any subtask of processor $2$ can begin. In contrast to this, the scheduling also assigns the nodes to time steps, which happens in larger batches (so-called supersteps) in this figure. In steps $2$ and $4$, the two processors can indeed execute the assigned workloads in a parallel manner.
-	}
-	\label{fig:part_sched}
-\end{figure}
-
 \subsection{Computation model}
 \label{sec:cost-models}
 
@@ -142,21 +132,38 @@ Partitioning,
 streaming,
 imply the same work-arounds.
 
+\subsection{Partitioning}
+
+Recall that scheduling assigns each vertex not only to a processor, but also to a specific time step or superstep. In contrast to this, graph or hypergraph partitioning is a simpler setting that only assigns each vertex to a specific processor. These problems typically enforce the workload distributed between processors with a balance constraint: for some small constant $\varepsilon$, every part can have at most an $(1+\varepsilon)$ factor more than average number of vertices (possibly weighted by the compute time of each vertex). The goal of partitioning is then to minimize the amount of communicated data (e.g., cut edges or hyperedges) subject to this balance constraint.
+
+Due to the time dimension, scheduling is often a much more suitable model to capture the efficient parallel execution of general computations. Consider the simple example in Figure~\ref{fig:part_sched} with a partitioning and a schedule on $2$ processors. The partitioning on the left is perfectly balanced in the sense that it assigns the same workload to both processors. However, in fact it does not allow for any parallelism during execution: due to the precedence constraints, all the nodes assigned to processor $1$ need to be computed before any of the nodes assigned to processor $2$ can be started. In contrast to this, the schedule on the right-hand side also considers the time dimension, and hence allows for significant parallelism in steps $2$ and $4$.
+
 \begin{figure}
 	\centering
-	\resizebox{.3\textwidth}{!}{\input{tikz/hyper.tikz}}
+	\resizebox{1.0\textwidth}{!}{\input{tikz/part_sched.tikz}}
 	\caption{
-		Here's an example hypergraph partitioning picture, if needed. Old description in comments.
-		%Illustration of a hypergraph with $9$ nodes and $4$ hyperedges. Consider the hyperedge $\{ v_1, v_2, v_3, v_4\}$ on the top. If we have a partitioning where e.g.\ $v_1$ and $v_4$ are assigned to processor $1$, $v_2$ to processor $2$, and $v_3$ to processor $3$, then we have $\lambda_h=3$ for this hyperedge, and hence its cost is $(\lambda_h-1)=2$. Indeed, if the data represented by the hyperedge is stored at processor $2$, for example, then it needs to be sent to two other processors (processors $1$ and $3$), so this hyperedge incurs $2$ communication steps under this partitioning.
+		Example partitioning (left) and a scheduling (right) of the same computation, with $2$ processors. While the partitioning is completely balanced (it assigns $9$ vertices to both parts), it does not allow any parallelism: all the vertices of processor $1$ need to be finished before any vertex of processor $2$ can begin executing. In contrast to this, scheduling also assigns the vertices to (super)steps. In (super)steps $2$ and $4$, the two processors can indeed execute the assigned workloads in a parallel manner.
 	}
-	\label{fig:hyper}
+	\label{fig:part_sched}
 \end{figure}
+
+On the other hand, partitioning is generally a better model when there are no precedence constraints between the vertices of the graph, i.e., they can be executed in any desired order. Indeed, many practical settings allow for some kind of modeling trick to ignore the time dimension in our model. One example is streaming applications, where new inputs are consecutively pushed through the same compute steps, as in e.g\ neural network training; one can essentially think of this as a setting where every operation is executed in each time step (on new data), thus allowing to ignore the time domain. Another example is sparse matrix-vector multiplication (SpMV), where the graph model can implicitly hide the inputs/outputs, with the vertices only representing the multiplication steps which are independent from each other~\cite{knigge2020improved, jenneskens22exact}. Yet another example is expert parallelism in the distributed serving of mixture-of-experts large language models (LLMs), where the experts in a layer compute independently from each other~\cite{replication_opdas}. For such problems, it is often much more beneficial to model the task as a partitioning problem, since this is notably simpler than scheduling from various perspectives.
+
+%\begin{figure}
+%	\centering
+%	\resizebox{.3\textwidth}{!}{\input{tikz/hyper.tikz}}
+%	\caption{
+%		Here's an example hypergraph partitioning picture, if needed. Old description in comments.
+		%Illustration of a hypergraph with $9$ nodes and $4$ hyperedges. Consider the hyperedge $\{ v_1, v_2, v_3, v_4\}$ on the top. If we have a partitioning where e.g.\ $v_1$ and $v_4$ are assigned to processor $1$, $v_2$ to processor $2$, and $v_3$ to processor $3$, then we have $\lambda_h=3$ for this hyperedge, and hence its cost is $(\lambda_h-1)=2$. Indeed, if the data represented by the hyperedge is stored at processor $2$, for example, then it needs to be sent to two other processors (processors $1$ and $3$), so this hyperedge incurs $2$ communication steps under this partitioning.
+%	}
+%	\label{fig:hyper}
+%\end{figure}
 
 
 \section{Scheduling is hard}
 \label{sec:scheduling-is-hard}
 
-The complexity of problems is computer science is often defined via the concept of \emph{NP-hardness}. Intuitively speaking, an NP-hard problem is one that is very unlikely to have an algorithm that can always find the optimal solution efficiently (i.e., with a running time that is polynomial in the size of the problem). In particular, if there was an efficient algorithm for any of the NP-hard problems, then all the other NP-hard problems could be solved efficiently as well, by reducing these problems to each other. Thousands of problems are known to be NP-hard, and many of these have been extensively studied by the community for decades; as such, when a problem is NP-hard, it is generally accepted that no polynomial-time algorithm exists for it.
+The complexity of problems in computer science is often defined via the concept of \emph{NP-hardness}. Intuitively speaking, an NP-hard problem is one that is very unlikely to have an algorithm that can always find the optimal solution efficiently (i.e., with a running time that is polynomial in the size of the problem). In particular, if there was an efficient algorithm for any of the NP-hard problems, then all the other NP-hard problems could be solved efficiently as well, by reducing these problems to each other. Thousands of problems are known to be NP-hard, and many of these have been extensively studied by the community for decades; as such, when a problem is NP-hard, it is generally accepted that no polynomial-time algorithm exists for it.
 
 Besides NP-hardness, there are other concepts that show that the problem is even more challenging. Inapproximability, for instance, means that even  finding a solution that is close to the optimal value is NP-hard. ``Close to optimal'' here means a solution that is a constant multiplicative or additive factor away from optimal. Parameterized complexity, on the other hand, studies whether the problem remains hard if some parameters of the input are fixed to a small value. Here, the crux lies with exposing a parameter that is suitably constrained in practical applications.
 
@@ -189,7 +196,7 @@ or, intuitively,
 the cost of parallelisation subtracted its minimal unavoidable cost.
 For general DAGs,
 the optimal surplus cost cannot be approximated within polynomial time to a multiplicative or an additive factor almost linear%
-\footnote{to be precise, a factor is within $n^{1/(\log\log n)^\delta}$, for some $\delta>0$}
+\footnote{to be precise, a factor that is within $n^{1/(\log\log n)^\delta}$, for some $\delta>0$}
 to the problem size $n$--
 meaning, any polynomial scheduling algorithm for general DAGs can be an almost arbitrary factor away from optimal.
 This hardness result restricts itself to the case $T_p$ and $T_\text{seq}$ are derived from the same underlying DAG
@@ -291,7 +298,7 @@ sophisticated algorithms that find optimised schedules automatically and despite
 \section{Avoiding hardness by avoiding generality}
 \label{sec:avoiding-hardness}
 
-We have shown that scheduling under realistic cost models hard,
+We have shown that scheduling under realistic cost models is hard,
 %and we proved finding polynomial-time algorithms that approach optimal solutions to some useful factor is impossible--
 yet practice does regularly realise software that achieves near-optimal performance on parallel architectures and systems.
 Positive results --meaning polynomial-time algorithms that find the optimum or approximate it within a useable factor--
@@ -607,7 +614,7 @@ Section~\ref{sec:scheduling-is-hard:vertical} introduced these and established t
 %Figure~\ref{fig:numa} pictures such a NUMA structure.
 %Valiant proposes the Multi-BSP model which costs data movement through such an arbitrary hierarchy in terms of latency and bandwidth,
 %modeling memory limitations at each level~\cite{valiant11}.
-We recall that Multi-BSP with depth $d=1$, unit $g$, and zero latency reduces to MPP.
+We recall that Multi-BSP with depth $d=1$, unit $g$ and vertex weights, and zero latency reduces to MPP.
 
 We may again consider specific DAG structures,
 prove lower bounds,
